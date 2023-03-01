@@ -1,3 +1,0 @@
-const SalePage = () => <></>
-
-export { SalePage }
