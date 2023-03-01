@@ -1,11 +1,15 @@
-import { Button, Flex, Text } from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  // Text
+} from '@chakra-ui/react'
 import Head from 'next/head'
 import React from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount } from 'wagmi'
+// import { useAccount } from 'wagmi'
 
-const MainPage = () => {
-  const { address } = useAccount()
+const Home = () => {
+  // const { address } = useAccount()
 
   return (
     <>
@@ -24,10 +28,10 @@ const MainPage = () => {
           Throw error
         </Button>
         <ConnectButton />
-        <Text>{address}</Text>
+        {/* <Text>{address}</Text> */}
       </Flex>
     </>
   )
 }
 
-export default MainPage
+export default Home

@@ -7,22 +7,11 @@ const { withSentryConfig } = require('@sentry/nextjs')
 const nextConfig = {
   reactStrictMode: true,
 
-  swcMinify: false,
-
-  experimental: {
-    fallbackNodePolyfills: false,
-  },
-
   eslint: {
     ignoreDuringBuilds: true,
   },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 
   distDir: 'build',
-
-  poweredByHeader: false,
 }
 
 module.exports = withSentryConfig(nextConfig, { silent: true }, { hideSourceMaps: true })
