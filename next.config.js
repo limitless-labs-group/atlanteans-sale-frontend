@@ -2,7 +2,7 @@
 // with Sentry.
 // https://nextjs.org/docs/api-reference/next.config.js/introduction
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-import { withSentryConfig } from '@sentry/nextjs'
+const { withSentryConfig } = require('@sentry/nextjs')
 
 const nextConfig = {
   reactStrictMode: true,
@@ -23,10 +23,6 @@ const nextConfig = {
   distDir: 'build',
 
   poweredByHeader: false,
-
-  sentry: {
-    hideSourceMaps: true,
-  },
 }
 
-module.exports = withSentryConfig(nextConfig, { silent: true })
+module.exports = withSentryConfig(nextConfig, { silent: true }, { hideSourceMaps: true })

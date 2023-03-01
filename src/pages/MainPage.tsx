@@ -1,8 +1,12 @@
-import { Button, Flex } from '@chakra-ui/react'
+import { Button, Flex, Text } from '@chakra-ui/react'
 import Head from 'next/head'
 import React from 'react'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAccount } from 'wagmi'
 
 const MainPage = () => {
+  const { address } = useAccount()
+
   return (
     <>
       <Head>
@@ -19,6 +23,8 @@ const MainPage = () => {
         >
           Throw error
         </Button>
+        <ConnectButton />
+        <Text>{address}</Text>
       </Flex>
     </>
   )
