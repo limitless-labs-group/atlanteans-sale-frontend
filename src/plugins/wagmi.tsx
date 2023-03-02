@@ -1,6 +1,7 @@
 import { configureChains, createClient, WagmiConfig } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
-import { SUPPORTED_CHAINS } from '@/constants'
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
+import { DEFAULT_CHAIN, SUPPORTED_CHAINS } from '@/constants'
 import '@rainbow-me/rainbowkit/styles.css'
 import { RainbowKitProvider, darkTheme, connectorsForWallets } from '@rainbow-me/rainbowkit'
 import {
@@ -16,6 +17,13 @@ import {
 import { PropsWithChildren } from 'react'
 
 const { provider, webSocketProvider, chains } = configureChains(SUPPORTED_CHAINS, [
+  jsonRpcProvider({
+    rpc: () => {
+      return {
+        http: DEFAULT_CHAIN.rpcUrls.default.http[0],
+      }
+    },
+  }),
   publicProvider(),
 ])
 
@@ -57,17 +65,3 @@ const WagmiProvider = ({ children }: PropsWithChildren) => (
 
 export { WagmiProvider }
 export default WagmiProvider
-
-// const client = createClient({
-//   connectors: [
-//     new InjectedConnector({ chains }),
-//     new WalletConnectConnector({
-//       chains,
-//       options: {
-//         qrcode: true,
-//       },
-//     }),
-//   ],
-//   provider,
-//   webSocketProvider,
-// })

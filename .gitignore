@@ -42,4 +42,4 @@ next-env.d.ts
 next.config.original.js
 
 # generative
-/src/types/contracts
+/src/contracts/types

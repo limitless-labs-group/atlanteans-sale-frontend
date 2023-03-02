@@ -14,7 +14,7 @@
     "prettier:fix": "prettier --write \"**/*.+(js|jsx|ts|tsx|json|yml|yaml|md|css)\"",
     "prepare": "husky install",
     "pre-commit": "lint-staged",
-    "typechain": "rimraf ./src/types/contracts && typechain --target=ethers-v5 **/*/abis/*.json --out-dir=src/types/contracts",
+    "typechain": "rimraf ./src/contracts/types && typechain --target=ethers-v5 **/*/abis/*.json --out-dir=src/contracts/types",
     "postinstall": "npm run typechain"
   },
   "dependencies": {
