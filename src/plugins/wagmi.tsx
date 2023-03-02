@@ -1,22 +1,44 @@
 import { configureChains, createClient, WagmiConfig } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
-// import { InjectedConnector } from '@wagmi/core/connectors/injected'
-// import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect'
-
 import { SUPPORTED_CHAINS } from '@/constants'
-
 import '@rainbow-me/rainbowkit/styles.css'
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit'
+import { RainbowKitProvider, darkTheme, connectorsForWallets } from '@rainbow-me/rainbowkit'
+import {
+  metaMaskWallet,
+  injectedWallet,
+  walletConnectWallet,
+  coinbaseWallet,
+  rainbowWallet,
+  braveWallet,
+  trustWallet,
+  ledgerWallet,
+} from '@rainbow-me/rainbowkit/wallets'
 import { PropsWithChildren } from 'react'
 
 const { provider, webSocketProvider, chains } = configureChains(SUPPORTED_CHAINS, [
   publicProvider(),
 ])
 
-const { connectors } = getDefaultWallets({
-  appName: 'Atlantis World',
-  chains,
-})
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Popular',
+    wallets: [
+      metaMaskWallet({ chains }),
+      injectedWallet({ chains }),
+      walletConnectWallet({ chains }),
+      coinbaseWallet({ appName: 'Atlantis World', chains }),
+    ],
+  },
+  {
+    groupName: 'More',
+    wallets: [
+      rainbowWallet({ chains }),
+      braveWallet({ chains }),
+      trustWallet({ chains }),
+      ledgerWallet({ chains }),
+    ],
+  },
+])
 
 const wagmiClient = createClient({
   autoConnect: true,
@@ -27,7 +49,9 @@ const wagmiClient = createClient({
 
 const WagmiProvider = ({ children }: PropsWithChildren) => (
   <WagmiConfig client={wagmiClient}>
-    <RainbowKitProvider chains={chains}>{children}</RainbowKitProvider>
+    <RainbowKitProvider chains={chains} theme={darkTheme()}>
+      {children}
+    </RainbowKitProvider>
   </WagmiConfig>
 )
 
