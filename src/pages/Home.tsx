@@ -1,4 +1,4 @@
-import { Button, Flex, Text } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 import Head from 'next/head'
 import React from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
@@ -16,13 +16,6 @@ const Home = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <Flex minH='100vh' justifyContent='center' alignItems='center'>
-        <Button
-          onClick={() => {
-            throw new Error('Sentry Frontend Error')
-          }}
-        >
-          Throw error
-        </Button>
         <ConnectButton />
         <Text>{address}</Text>
       </Flex>

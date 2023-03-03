@@ -15,7 +15,8 @@
     "prepare": "husky install",
     "pre-commit": "lint-staged",
     "typechain": "rimraf ./src/contracts/types && typechain --target=ethers-v5 **/*/abis/*.json --out-dir=src/contracts/types",
-    "postinstall": "npm run typechain"
+    "postinstall": "yarn typechain",
+    "test": "jest --watch"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.5.1",
@@ -33,6 +34,8 @@
     "wagmi": "^0.11.7"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
     "@typechain/ethers-v5": "10.1.0",
     "@types/node": "18.14.2",
     "@types/react": "18.0.28",
@@ -42,6 +45,8 @@
     "eslint-config-next": "^13.2.3",
     "eslint-config-prettier": "^8.6.0",
     "husky": "^8.0.3",
+    "jest": "^28.1.3",
+    "jest-environment-jsdom": "^29.4.3",
     "lint-staged": "^13.1.2",
     "prettier": "^2.8.4",
     "rimraf": "^4.1.2",
