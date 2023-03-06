@@ -2,17 +2,20 @@ import { useAtlanteansSaleContract } from '@/contracts'
 import { useLogger, useToast } from '@/hooks'
 import { useMutation } from '@tanstack/react-query'
 
-interface IMintWithAuctionBid {
+interface IMintDA {
   tokenAmount: number
 }
 
-export const useMintWithAuctionBid = () => {
-  const log = useLogger(useMintWithAuctionBid.name)
+/**
+ * ! Phase 2: Dutch Auction (paid)
+ */
+export const useMintDA = () => {
+  const log = useLogger(useMintDA.name)
   const toast = useToast()
   const atlanteansSaleContract = useAtlanteansSaleContract()
 
   const mutation = useMutation({
-    mutationFn: async ({ tokenAmount }: IMintWithAuctionBid) => {
+    mutationFn: async ({ tokenAmount }: IMintDA) => {
       const nonce = await atlanteansSaleContract.signer.getTransactionCount()
       const currentAuctionBidPrice = await atlanteansSaleContract.currentDaPrice()
       const totalBidPrice = currentAuctionBidPrice.mul(tokenAmount)
@@ -29,7 +32,7 @@ export const useMintWithAuctionBid = () => {
       log.error({ error, variables, context })
       // toast.close(useBidSummon.name);
       toast({
-        id: useMintWithAuctionBid.name,
+        id: useMintDA.name,
         status: 'error',
         title: error?.message ?? 'Error',
         description: error?.data?.message || 'unexpected error occurred',
@@ -43,9 +46,9 @@ export const useMintWithAuctionBid = () => {
     },
     onSuccess: (data, variables, context) => {
       log.success({ data, variables, context })
-      toast.close(useMintWithAuctionBid.name)
+      toast.close(useMintDA.name)
       toast({
-        id: useMintWithAuctionBid.name,
+        id: useMintDA.name,
         status: 'success',
         title: 'Success',
         description: data.hash,

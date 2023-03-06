@@ -1,3 +1,3 @@
-export * from './useMintWithAuctionBid'
-export * from './useMintWithFreeClaim'
-export * from './useMintWithWLPurchase'
+export * from './useMintDA'
+export * from './useClaim'
+export * from './useMintWL'

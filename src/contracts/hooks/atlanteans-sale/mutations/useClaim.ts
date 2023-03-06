@@ -1,32 +1,24 @@
 import { useMutation } from '@tanstack/react-query'
 import { useToast, useLogger } from '@/hooks'
 import { useAtlanteansSaleContract } from '@/contracts'
+import { AtlanteansApi } from '@/apis'
 
 /**
- * Keys & Scrolls holders who burned their scrolls are allowed to claim a charcter for free
+ * ! Phase 4: free claim for Founding Atlanteans (who are allowed via merkle tree)
  */
-export const useMintWithFreeClaim = () => {
-  const log = useLogger(useMintWithFreeClaim.name)
+export const useClaim = () => {
+  const log = useLogger(useClaim.name)
   const toast = useToast()
   const atlanteansSaleContract = useAtlanteansSaleContract()
-  // const serverlessApi = useServerlessApi()
 
-  const mutations = useMutation({
+  const mutation = useMutation({
     mutationFn: async () => {
-      // const {
-      //   data: { message: signingMessage, value },
-      // } = await serverlessApi.get('/atlanteans/merkle/signing-message/claimlist')
-      // const signature = await atlanteansSale.signer.signMessage(signingMessage)
+      const { message, digest } = await AtlanteansApi.fetchClaimMessageToSign()
+      const signature = await atlanteansSaleContract.signer.signMessage(message)
       const nonce = await atlanteansSaleContract.signer.getTransactionCount()
+      const proof = await AtlanteansApi.fetchClaimProof(digest, signature)
 
-      // const {
-      //   data: { proof },
-      // } = await serverlessApi.post(`/atlanteans/merkle/proof/claimlist`, {
-      //   digest: value,
-      //   signature,
-      // })
-
-      const tx = await atlanteansSaleContract.claimSummon(['proof'], {
+      const tx = await atlanteansSaleContract.claimSummon(proof, {
         gasLimit: 1_000_000,
         nonce,
       })
@@ -36,7 +28,7 @@ export const useMintWithFreeClaim = () => {
     onError: (error: any, variables, context) => {
       log.error({ error, variables, context })
       toast({
-        id: useMintWithFreeClaim.name,
+        id: useClaim.name,
         status: 'error',
         title: error?.message ?? 'Error',
         description: error?.data?.message || 'unexpected error occurred',
@@ -51,7 +43,7 @@ export const useMintWithFreeClaim = () => {
     onSuccess: (data, variables, context) => {
       log.success({ data, variables, context })
       toast({
-        id: useMintWithFreeClaim.name,
+        id: useClaim.name,
         status: 'success',
         title: 'Success',
         description: data.hash,
@@ -59,5 +51,5 @@ export const useMintWithFreeClaim = () => {
     },
   })
 
-  return mutations
+  return mutation
 }
