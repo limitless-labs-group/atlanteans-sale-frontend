@@ -1,12 +1,9 @@
-import { Flex, Text } from '@chakra-ui/react'
+import { Flex } from '@chakra-ui/react'
 import Head from 'next/head'
 import React from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount } from 'wagmi'
 
 const Home = () => {
-  const { address } = useAccount()
-
   return (
     <>
       <Head>
@@ -17,7 +14,6 @@ const Home = () => {
       </Head>
       <Flex minH='100vh' justifyContent='center' alignItems='center'>
         <ConnectButton />
-        <Text>{address}</Text>
       </Flex>
     </>
   )
