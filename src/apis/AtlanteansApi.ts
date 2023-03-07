@@ -1,52 +1,41 @@
+import { SALE_PHASE } from '@/constants'
 import { MerkleProof } from '@/types'
 import axios, { AxiosInstance } from 'axios'
 import { Bytes } from 'ethers'
 
-interface IAtlanteansApiMessageToSign {
+interface IAtlanteansAPIMessageToSignResponse {
   message: string | Bytes
   digest: number
 }
 
-export class AtlanteansApi {
+interface IAtlanteansAPIMerkleProofResponse {
+  proof: MerkleProof
+}
+
+export class AtlanteansAPI {
   public static baseURL?: string = process.env.NEXT_PUBLIC_ATLANTEANS_API_BASE_URL
   public static http: AxiosInstance = axios.create({
     baseURL: this.baseURL,
-    headers: {
-      Authorization: `Bearer ${null}`,
-    },
+    // headers: {
+    //   Authorization: `Bearer ${null}`,
+    // },
   })
 
   /**
-   * WL: paid mint for whitelisted
+   * WL & CLAIM logic: sign message and fetch proof
    */
-  public static fetchWLMessageToSign = async () => {
-    const { data } = await this.http.get<IAtlanteansApiMessageToSign>(
-      '/atlanteans/merkle/signing-message/mintlist'
+  public static fetchMessageToSign = async (salePhase: SALE_PHASE) => {
+    const { data } = await this.http.get<IAtlanteansAPIMessageToSignResponse>(
+      `/atlanteans/merkle/signing-message/${salePhase}`
     )
     return data
   }
 
-  public static fetchWLProof = async (digest: number, signature: string) => {
-    const { data: proof } = await this.http.post<MerkleProof>(`/atlanteans/merkle/proof/mintlist`, {
-      digest,
-      signature,
-    })
-    return proof
-  }
-
-  /**
-   * claim: FA free mint
-   */
-  public static fetchClaimMessageToSign = async () => {
-    const { data } = await this.http.get<IAtlanteansApiMessageToSign>(
-      '/atlanteans/merkle/signing-message/claimlist'
-    )
-    return data
-  }
-
-  public static fetchClaimProof = async (digest: number, signature: string) => {
-    const { data: proof } = await this.http.post<MerkleProof>(
-      `/atlanteans/merkle/proof/claimlist`,
+  public static fetchProof = async (salePhase: SALE_PHASE, digest: number, signature: string) => {
+    const {
+      data: { proof },
+    } = await this.http.post<IAtlanteansAPIMerkleProofResponse>(
+      `/atlanteans/merkle/proof/${salePhase}`,
       {
         digest,
         signature,

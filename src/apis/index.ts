@@ -1,1 +1,1 @@
-export * from './AtlanteansApi'
+export * from './AtlanteansAPI'
