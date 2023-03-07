@@ -4,7 +4,7 @@ import { DEFAULT_CHAIN } from '@/constants'
 import { getProvider } from '@wagmi/core'
 import { SignerOrProvider } from '@/types'
 
-export class Erc20Util {
+export class ERC20Util {
   static getContract = (address: string, signerOrProvider?: SignerOrProvider): ERC20 => {
     const provider = getProvider({ chainId: DEFAULT_CHAIN.id })
     const erc20Contract = ERC20__factory.connect(address, signerOrProvider ?? provider)

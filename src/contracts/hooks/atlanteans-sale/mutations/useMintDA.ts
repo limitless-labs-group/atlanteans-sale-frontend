@@ -1,31 +1,24 @@
-import { useAtlanteansSaleContract } from '@/contracts'
-import { useLogger, useToast } from '@/hooks'
+import { useLogger, useNetwork, useToast } from '@/hooks'
 import { useMutation } from '@tanstack/react-query'
-
-interface IMintDA {
-  tokenAmount: number
-}
+import { useSigner } from 'wagmi'
+import { AtlanteansSaleUtil } from '@/contracts'
 
 /**
- * ! Phase 2: Dutch Auction (paid)
+ * * Phase 2: Dutch Auction (paid)
  */
 export const useMintDA = () => {
   const log = useLogger(useMintDA.name)
   const toast = useToast()
-  const atlanteansSaleContract = useAtlanteansSaleContract()
+
+  const { isActiveChainSupported } = useNetwork()
+  const { data: signer } = useSigner()
 
   const mutation = useMutation({
-    mutationFn: async ({ tokenAmount }: IMintDA) => {
-      const nonce = await atlanteansSaleContract.signer.getTransactionCount()
-      const currentAuctionBidPrice = await atlanteansSaleContract.currentDaPrice()
-      const totalBidPrice = currentAuctionBidPrice.mul(tokenAmount)
-
-      const tx = await atlanteansSaleContract['bidSummon(uint256)'](tokenAmount, {
-        value: totalBidPrice,
-        gasLimit: 1_000_000,
-        nonce,
-      })
-
+    mutationFn: async (tokenAmount: number) => {
+      if (!isActiveChainSupported || !signer) {
+        return
+      }
+      const tx = await AtlanteansSaleUtil.mintDA(signer, tokenAmount)
       return tx
     },
     onError: (error: any, variables, context) => {
@@ -51,7 +44,7 @@ export const useMintDA = () => {
         id: useMintDA.name,
         status: 'success',
         title: 'Success',
-        description: data.hash,
+        description: data?.hash,
       })
     },
   })

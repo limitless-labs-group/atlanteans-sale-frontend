@@ -1,3 +1,3 @@
 export * from './AtlanteansUtil'
 export * from './AtlanteansSaleUtil'
-export * from './Erc20Util'
+export * from './ERC20Util'

@@ -1,28 +1,24 @@
 import { useMutation } from '@tanstack/react-query'
-import { useToast, useLogger } from '@/hooks'
-import { useAtlanteansSaleContract } from '@/contracts'
-import { AtlanteansApi } from '@/apis'
+import { useToast, useLogger, useNetwork } from '@/hooks'
+import { AtlanteansSaleUtil } from '@/contracts'
+import { useSigner } from 'wagmi'
 
 /**
- * ! Phase 4: free claim for Founding Atlanteans (who are allowed via merkle tree)
+ * * Phase 4: free claim for Founding Atlanteans (who are allowed via merkle tree)
  */
 export const useClaim = () => {
   const log = useLogger(useClaim.name)
   const toast = useToast()
-  const atlanteansSaleContract = useAtlanteansSaleContract()
+
+  const { isActiveChainSupported } = useNetwork()
+  const { data: signer } = useSigner()
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const { message, digest } = await AtlanteansApi.fetchClaimMessageToSign()
-      const signature = await atlanteansSaleContract.signer.signMessage(message)
-      const nonce = await atlanteansSaleContract.signer.getTransactionCount()
-      const proof = await AtlanteansApi.fetchClaimProof(digest, signature)
-
-      const tx = await atlanteansSaleContract.claimSummon(proof, {
-        gasLimit: 1_000_000,
-        nonce,
-      })
-
+      if (!isActiveChainSupported || !signer) {
+        return
+      }
+      const tx = await AtlanteansSaleUtil.claim(signer)
       return tx
     },
     onError: (error: any, variables, context) => {
@@ -46,7 +42,7 @@ export const useClaim = () => {
         id: useClaim.name,
         status: 'success',
         title: 'Success',
-        description: data.hash,
+        description: data?.hash,
       })
     },
   })

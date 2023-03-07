@@ -1,32 +1,24 @@
-import { useAtlanteansSaleContract } from '@/contracts'
-import { useLogger, useToast } from '@/hooks'
+import { AtlanteansSaleUtil } from '@/contracts'
+import { useLogger, useNetwork, useToast } from '@/hooks'
 import { useMutation } from '@tanstack/react-query'
-
-interface IMintPublic {
-  tokenAmount: number
-}
+import { useSigner } from 'wagmi'
 
 /**
- * ! Phase 3: Public (paid)
- * TODO: replace bidSummon with publicSummon once contract is ready
+ * * Phase 3: Public (paid)
  */
 export const useMintPublic = () => {
   const log = useLogger(useMintPublic.name)
   const toast = useToast()
-  const atlanteansSaleContract = useAtlanteansSaleContract()
+
+  const { isActiveChainSupported } = useNetwork()
+  const { data: signer } = useSigner()
 
   const mutation = useMutation({
-    mutationFn: async ({ tokenAmount }: IMintPublic) => {
-      const nonce = await atlanteansSaleContract.signer.getTransactionCount()
-      const tokenPrice = await atlanteansSaleContract.finalPrice()
-      const totalPrice = tokenPrice.mul(tokenAmount)
-
-      const tx = await atlanteansSaleContract['bidSummon(uint256)'](tokenAmount, {
-        value: totalPrice,
-        gasLimit: 1_000_000,
-        nonce,
-      })
-
+    mutationFn: async (tokenAmount: number) => {
+      if (!isActiveChainSupported || !signer) {
+        return
+      }
+      const tx = await AtlanteansSaleUtil.mintPublic(signer, tokenAmount)
       return tx
     },
     onError: (error: any, variables, context) => {
@@ -52,7 +44,7 @@ export const useMintPublic = () => {
         id: useMintPublic.name,
         status: 'success',
         title: 'Success',
-        description: data.hash,
+        description: data?.hash,
       })
     },
   })

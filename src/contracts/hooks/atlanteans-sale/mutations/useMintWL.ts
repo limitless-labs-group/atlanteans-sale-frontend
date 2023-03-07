@@ -1,31 +1,24 @@
 import { useMutation } from '@tanstack/react-query'
-import { useLogger, useToast } from '@/hooks'
-import { useAtlanteansSaleContract } from '@/contracts'
-import { AtlanteansApi } from '@/apis'
+import { useLogger, useNetwork, useToast } from '@/hooks'
+import { AtlanteansSaleUtil } from '@/contracts'
+import { useSigner } from 'wagmi'
 
 /**
- * ! Phase 1: Whitelist (paid)
+ * * Phase 1: Whitelist (paid)
  */
 export const useMintWL = () => {
   const log = useLogger(useMintWL.name)
   const toast = useToast()
-  const atlanteansSaleContract = useAtlanteansSaleContract()
+
+  const { isActiveChainSupported } = useNetwork()
+  const { data: signer } = useSigner()
 
   const mutation = useMutation({
-    mutationFn: async () => {
-      const { message, digest } = await AtlanteansApi.fetchWLMessageToSign()
-      const signature = await atlanteansSaleContract.signer.signMessage(message)
-      const nonce = await atlanteansSaleContract.signer.getTransactionCount()
-      const proof = await AtlanteansApi.fetchWLProof(digest, signature)
-
-      const tokenPrice = await atlanteansSaleContract.finalPrice()
-
-      const tx = await atlanteansSaleContract['mintlistSummon(bytes32[])'](proof, {
-        value: tokenPrice,
-        gasLimit: 1_000_000,
-        nonce,
-      })
-
+    mutationFn: async (tokenAmount: number) => {
+      if (!isActiveChainSupported || !signer) {
+        return
+      }
+      const tx = await AtlanteansSaleUtil.mintWL(signer, tokenAmount)
       return tx
     },
     onError: (error: any, variables, context) => {
@@ -49,7 +42,7 @@ export const useMintWL = () => {
         id: useMintWL.name,
         status: 'success',
         title: 'Success',
-        description: data.hash,
+        description: data?.hash,
       })
     },
   })
