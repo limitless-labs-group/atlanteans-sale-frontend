@@ -1,1 +1,1 @@
-export * from './useErc20Contract'
+export * from './useERC20Contract'
