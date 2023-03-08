@@ -18,7 +18,7 @@ export const useMintDA = () => {
       if (!isActiveChainSupported || !signer) {
         return
       }
-      const tx = await AtlanteansSaleUtil.mintDA(signer, tokenAmount)
+      const { tx, error } = await AtlanteansSaleUtil.mintDA(signer, tokenAmount)
       return tx
     },
     onError: (error: any, variables, context) => {

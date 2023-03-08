@@ -18,7 +18,7 @@ export const useClaim = () => {
       if (!isActiveChainSupported || !signer) {
         return
       }
-      const tx = await AtlanteansSaleUtil.claim(signer)
+      const { tx, error } = await AtlanteansSaleUtil.claim(signer)
       return tx
     },
     onError: (error: any, variables, context) => {

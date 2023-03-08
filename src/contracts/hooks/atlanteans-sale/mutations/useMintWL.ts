@@ -18,7 +18,7 @@ export const useMintWL = () => {
       if (!isActiveChainSupported || !signer) {
         return
       }
-      const tx = await AtlanteansSaleUtil.mintWL(signer, tokenAmount)
+      const { tx, error } = await AtlanteansSaleUtil.mintWL(signer, tokenAmount)
       return tx
     },
     onError: (error: any, variables, context) => {

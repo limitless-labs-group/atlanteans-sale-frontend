@@ -6,7 +6,7 @@ export const useAtlanteansContract = () => {
   const { supportedChain } = useNetwork()
   const signerOrProvider = useSignerOrProvider()
   const atlanteansContract = useMemo(
-    () => AtlanteansUtil.getContract(supportedChain.id, signerOrProvider),
+    () => AtlanteansUtil.getContract({ chainId: supportedChain.id, signerOrProvider }),
     [supportedChain, signerOrProvider]
   )
   return atlanteansContract

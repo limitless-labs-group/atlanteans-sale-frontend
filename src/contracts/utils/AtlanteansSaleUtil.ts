@@ -1,50 +1,78 @@
 import { AtlanteansAPI } from '@/apis'
 import {
   DEFAULT_CHAIN,
-  SupportedChainId,
   MINT_GAS_LIMIT,
-  SALE_PHASE,
   MINT_LIMIT_PER_TX,
+  MINT_LIMIT_TOTAL,
+  SupportedChainId,
+  SalePhase,
 } from '@/constants'
 import {
   ATLANTEANS_SALE_CONTRACT_ADDRESS,
   AtlanteansSale__factory,
   AtlanteansSale,
 } from '@/contracts'
-import { Signer, SignerOrProvider } from '@/types'
-import { getProvider } from '@wagmi/core'
-import { ContractTransaction } from 'ethers'
+import { Signer, SignerOrProvider, ContractTransaction } from '@/types'
+import { getChain, getProvider } from '@/utils'
 
-interface IGetContract {
+interface IAtlanteansSaleUtilGetContract {
   signerOrProvider?: SignerOrProvider
   chainId?: number
 }
 
+enum MintError {
+  LIMIT_PER_TX = 'The maximum number of tokens to mint per single transaction is LIMIT_TO_REPLACE',
+  LIMIT_TOTAL = 'The number of tokens you are trying to mint is over your limits. You can mint maximum LIMIT_TO_REPLACE',
+  ALREADY_MINTED = 'You already minted the maximum number of tokens allowed',
+}
+
+type IAtlanteansSaleUtilMintResponse = Promise<{
+  tx?: ContractTransaction
+  error?: string
+}>
+
 export class AtlanteansSaleUtil {
-  static getContract = ({ chainId: chainId_, signerOrProvider }: IGetContract): AtlanteansSale => {
-    const chainId = chainId_ ?? DEFAULT_CHAIN.id
-    const provider = getProvider({ chainId })
+  static getContract = ({
+    chainId = DEFAULT_CHAIN.id,
+    signerOrProvider,
+  }: IAtlanteansSaleUtilGetContract): AtlanteansSale => {
+    const chain = getChain(chainId)
+    const provider = getProvider({ chain })
     const address = ATLANTEANS_SALE_CONTRACT_ADDRESS[chainId as SupportedChainId]
     const contract = AtlanteansSale__factory.connect(address, signerOrProvider ?? provider)
     return contract
   }
 
-  // TODO: limit tokenAmount to 2 once mintlistMinted is adjusted
-  static mintWL = async (
-    signer: Signer,
-    tokenAmount: number
-  ): Promise<ContractTransaction | undefined> => {
-    const maxTokenAmount = MINT_LIMIT_PER_TX[SALE_PHASE.WL]
-    if (tokenAmount > Number(maxTokenAmount)) {
-      return
+  static mintWL = async (signer: Signer, tokenAmount: number): IAtlanteansSaleUtilMintResponse => {
+    const contract = this.getContract({ signerOrProvider: signer })
+    const address = await signer.getAddress()
+
+    // verify if not over limits
+    const tokenAmountMinted = (await contract.mintlistMinted(address)).toNumber()
+    const tokenAmountLeft = MINT_LIMIT_TOTAL[SalePhase.WL] - tokenAmountMinted
+    const maxTokenAmountPerTx = MINT_LIMIT_PER_TX[SalePhase.WL]
+    if (tokenAmountLeft <= 0) {
+      return {
+        error: MintError.ALREADY_MINTED,
+      }
+    }
+    if (tokenAmount > tokenAmountLeft) {
+      return {
+        error: MintError.LIMIT_TOTAL.replace('LIMIT_TO_REPLACE', tokenAmountLeft.toString()),
+      }
+    }
+    if (tokenAmount > maxTokenAmountPerTx) {
+      return {
+        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxTokenAmountPerTx.toString()),
+      }
     }
 
-    const contract = this.getContract({ signerOrProvider: signer })
-
-    const { message, digest } = await AtlanteansAPI.fetchMessageToSign(SALE_PHASE.WL)
+    // getting merkle proof
+    const { message, hash } = await AtlanteansAPI.fetchMessageToSign(SalePhase.WL)
     const signature = await signer.signMessage(message)
-    const proof = await AtlanteansAPI.fetchProof(SALE_PHASE.WL, digest, signature)
+    const proof = await AtlanteansAPI.fetchProof(SalePhase.WL, hash, signature)
 
+    // calculating ethers to send
     const tokenPrice = await contract.mintlistPrice()
     const totalPrice = tokenPrice.mul(tokenAmount)
 
@@ -56,20 +84,21 @@ export class AtlanteansSaleUtil {
       nonce,
     })
 
-    return tx
+    return { tx }
   }
 
-  static mintDA = async (
-    signer: Signer,
-    tokenAmount: number
-  ): Promise<ContractTransaction | undefined> => {
-    const maxTokenAmount = MINT_LIMIT_PER_TX[SALE_PHASE.DA]
-    if (tokenAmount > Number(maxTokenAmount)) {
-      return
+  static mintDA = async (signer: Signer, tokenAmount: number): IAtlanteansSaleUtilMintResponse => {
+    // verify if not over limits
+    const maxTokenAmountPerTx = MINT_LIMIT_PER_TX[SalePhase.DA]
+    if (tokenAmount > maxTokenAmountPerTx) {
+      return {
+        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxTokenAmountPerTx.toString()),
+      }
     }
 
     const contract = this.getContract({ signerOrProvider: signer })
 
+    // calculating ethers to send
     const tokenPrice = await contract.currentDaPrice()
     const totalPrice = tokenPrice.mul(tokenAmount)
 
@@ -81,16 +110,19 @@ export class AtlanteansSaleUtil {
       nonce,
     })
 
-    return tx
+    return { tx }
   }
 
   static mintPublic = async (
     signer: Signer,
     tokenAmount: number
-  ): Promise<ContractTransaction | undefined> => {
-    const maxTokenAmount = MINT_LIMIT_PER_TX[SALE_PHASE.PUBLIC]
-    if (tokenAmount > Number(maxTokenAmount)) {
-      return
+  ): IAtlanteansSaleUtilMintResponse => {
+    // verify if not over limits
+    const maxTokenAmountPerTx = MINT_LIMIT_PER_TX[SalePhase.PUBLIC]
+    if (tokenAmount > maxTokenAmountPerTx) {
+      return {
+        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxTokenAmountPerTx.toString()),
+      }
     }
 
     const contract = this.getContract({ signerOrProvider: signer })
@@ -106,15 +138,23 @@ export class AtlanteansSaleUtil {
       nonce,
     })
 
-    return tx
+    return { tx }
   }
 
-  static claim = async (signer: Signer): Promise<ContractTransaction> => {
+  static claim = async (signer: Signer): IAtlanteansSaleUtilMintResponse => {
     const contract = this.getContract({ signerOrProvider: signer })
+    const address = await signer.getAddress()
 
-    const { message, digest } = await AtlanteansAPI.fetchMessageToSign(SALE_PHASE.CLAIM)
+    const hasClaimed = await contract.claimlistMinted(address)
+    if (hasClaimed) {
+      return {
+        error: MintError.ALREADY_MINTED,
+      }
+    }
+
+    const { message, hash } = await AtlanteansAPI.fetchMessageToSign(SalePhase.CLAIM)
     const signature = await signer.signMessage(message)
-    const proof = await AtlanteansAPI.fetchProof(SALE_PHASE.CLAIM, digest, signature)
+    const proof = await AtlanteansAPI.fetchProof(SalePhase.CLAIM, hash, signature)
 
     const nonce = await signer.getTransactionCount()
 
@@ -123,6 +163,6 @@ export class AtlanteansSaleUtil {
       nonce,
     })
 
-    return tx
+    return { tx }
   }
 }

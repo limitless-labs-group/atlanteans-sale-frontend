@@ -18,7 +18,7 @@ export const useMintPublic = () => {
       if (!isActiveChainSupported || !signer) {
         return
       }
-      const tx = await AtlanteansSaleUtil.mintPublic(signer, tokenAmount)
+      const { tx, error } = await AtlanteansSaleUtil.mintPublic(signer, tokenAmount)
       return tx
     },
     onError: (error: any, variables, context) => {
