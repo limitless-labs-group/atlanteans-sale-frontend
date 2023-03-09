@@ -1,9 +1,9 @@
 import { SalePhase } from '@/constants'
-import { Bytes, MerkleProof } from '@/types'
+import { MerkleProof } from '@/types'
 import axios, { AxiosInstance } from 'axios'
 
 interface IAtlanteansAPIMessageToSignResponse {
-  message: string | Bytes
+  message: string
   value: string
 }
 
@@ -25,20 +25,20 @@ export class AtlanteansAPI {
    */
   public static fetchMessageToSign = async (salePhase: SalePhase) => {
     const {
-      data: { message, value: hash },
+      data: { message },
     } = await this.http.get<IAtlanteansAPIMessageToSignResponse>(
       `/atlanteans/merkle/signing-message/${salePhase}`
     )
-    return { message, hash }
+    return message
   }
 
-  public static fetchProof = async (salePhase: SalePhase, hash: string, signature: string) => {
+  public static fetchProof = async (salePhase: SalePhase, message: string, signature: string) => {
     const {
       data: { proof },
     } = await this.http.post<IAtlanteansAPIMerkleProofResponse>(
       `/atlanteans/merkle/proof/${salePhase}`,
       {
-        digest: hash,
+        digest: message,
         signature,
       }
     )
