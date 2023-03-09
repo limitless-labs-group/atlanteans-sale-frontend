@@ -16,14 +16,16 @@ export const useMintPublic = () => {
   const mutation = useMutation({
     mutationFn: async (tokenAmount: number) => {
       if (!isActiveChainSupported || !signer) {
+        // TODO: toast error
         return
       }
-      const { tx, error } = await AtlanteansSaleUtil.mintPublic(signer, tokenAmount)
+
+      const { tx, error } = await AtlanteansSaleUtil.mintPublic({ signer, tokenAmount })
+      // TODO: toast error
       return tx
     },
     onError: (error: any, variables, context) => {
       log.error({ error, variables, context })
-      // toast.close(useBidSummon.name);
       toast({
         id: useMintPublic.name,
         status: 'error',

@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { useLogger, useNetwork, useToast } from '@/hooks'
+import { useFetchProof, useLogger, useNetwork, useToast } from '@/hooks'
 import { AtlanteansSaleUtil } from '@/contracts'
 import { useSigner } from 'wagmi'
+import { SalePhase } from '@/constants'
 
 /**
  * * Phase 1: Whitelist (paid)
@@ -12,13 +13,23 @@ export const useMintWL = () => {
 
   const { isActiveChainSupported } = useNetwork()
   const { data: signer } = useSigner()
+  const { mutateAsync: fetchProof } = useFetchProof()
 
   const mutation = useMutation({
     mutationFn: async (tokenAmount: number) => {
       if (!isActiveChainSupported || !signer) {
-        return
+        // TODO: toast error
+        return undefined
       }
-      const { tx, error } = await AtlanteansSaleUtil.mintWL(signer, tokenAmount)
+
+      const proof = await fetchProof({ salePhase: SalePhase.WL })
+      if (!proof) {
+        // TODO: toast error
+        return undefined
+      }
+
+      const { tx, error } = await AtlanteansSaleUtil.mintWL({ signer, tokenAmount, proof })
+      // TODO: toast error
       return tx
     },
     onError: (error: any, variables, context) => {

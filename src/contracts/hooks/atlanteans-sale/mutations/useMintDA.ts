@@ -16,9 +16,12 @@ export const useMintDA = () => {
   const mutation = useMutation({
     mutationFn: async (tokenAmount: number) => {
       if (!isActiveChainSupported || !signer) {
+        // TODO: toast error
         return
       }
-      const { tx, error } = await AtlanteansSaleUtil.mintDA(signer, tokenAmount)
+
+      const { tx, error } = await AtlanteansSaleUtil.mintDA({ signer, tokenAmount })
+      // TODO: toast error
       return tx
     },
     onError: (error: any, variables, context) => {

@@ -2,13 +2,13 @@ import { useAtlanteansSaleContract } from '@/contracts'
 import { useLogger } from '@/hooks'
 import { useQuery } from '@tanstack/react-query'
 
-export const useCurrentDAPrice = () => {
-  const log = useLogger(useCurrentDAPrice.name)
+export const useClaimStarted = () => {
+  const log = useLogger(useClaimStarted.name)
   const atlanteansSale = useAtlanteansSaleContract()
 
   const query = useQuery({
-    queryKey: ['current-da-price-query'],
-    queryFn: () => atlanteansSale.currentDaPrice(),
+    queryKey: ['claim-started-query'],
+    queryFn: () => atlanteansSale.claimsStarted(),
     onError: (error) => {
       log.error({ error })
     },

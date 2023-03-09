@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { useToast, useLogger, useNetwork } from '@/hooks'
+import { useToast, useLogger, useNetwork, useFetchProof } from '@/hooks'
 import { AtlanteansSaleUtil } from '@/contracts'
 import { useSigner } from 'wagmi'
+import { SalePhase } from '@/constants'
 
 /**
  * * Phase 4: free claim for Founding Atlanteans (who are allowed via merkle tree)
@@ -12,13 +13,23 @@ export const useClaim = () => {
 
   const { isActiveChainSupported } = useNetwork()
   const { data: signer } = useSigner()
+  const { mutateAsync: fetchProof } = useFetchProof()
 
   const mutation = useMutation({
     mutationFn: async () => {
       if (!isActiveChainSupported || !signer) {
+        // TODO: toast error
         return
       }
-      const { tx, error } = await AtlanteansSaleUtil.claim(signer)
+
+      const proof = await fetchProof({ salePhase: SalePhase.WL })
+      if (!proof) {
+        // TODO: toast error
+        return undefined
+      }
+
+      const { tx, error } = await AtlanteansSaleUtil.claim({ signer, proof })
+      // TODO: toast error
       return tx
     },
     onError: (error: any, variables, context) => {

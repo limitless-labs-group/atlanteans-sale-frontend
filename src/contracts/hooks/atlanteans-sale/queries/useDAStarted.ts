@@ -2,20 +2,20 @@ import { useAtlanteansSaleContract } from '@/contracts'
 import { useLogger } from '@/hooks'
 import { useQuery } from '@tanstack/react-query'
 
-export const useDaStarted = () => {
-  const log = useLogger(useDaStarted.name)
+export const useDAStarted = () => {
+  const log = useLogger(useDAStarted.name)
   const atlanteansSale = useAtlanteansSaleContract()
 
-  return useQuery(['current-da-price'], async () => await atlanteansSale.daStarted(), {
-    cacheTime: 0,
-    onError(error) {
+  const query = useQuery({
+    queryKey: ['da-started-query'],
+    queryFn: () => atlanteansSale.daStarted(),
+    onError: (error) => {
       log.error({ error })
     },
-    onSettled(data, error) {
-      log.verbose('ON_SETTLED', { data, error })
-    },
-    onSuccess(data) {
+    onSuccess: (data) => {
       log.success({ data })
     },
   })
+
+  return query
 }
