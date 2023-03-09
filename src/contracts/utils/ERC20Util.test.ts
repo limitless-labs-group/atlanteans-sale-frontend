@@ -3,7 +3,7 @@ import { ERC20Util } from '@/contracts/utils/ERC20Util'
 import { getProvider } from '@/utils'
 import { utils, Wallet } from 'ethers'
 
-describe('Erc20Util', () => {
+describe('ERC20Util', () => {
   const token = WETH[TESTNET_CHAIN.id]
   const MaxSchnaider = '0xb1D7daD6baEF98df97bD2d3Fb7540c08886e0299'
   const spender = '0x660FBab221eCD6F915a2b10e91471E7315A9FEC4'
@@ -23,7 +23,7 @@ describe('Erc20Util', () => {
     )
     // console.log(`Balance: ${balance} ${token.symbol}`)
     expect(balance).toBeGreaterThanOrEqual(0)
-  })
+  }, 10000)
 
   it('should return allowance for spender', async () => {
     const { formatted: allowance } = await ERC20Util.fetchAllowance(
@@ -34,7 +34,7 @@ describe('Erc20Util', () => {
     )
     // console.log(`Allowance: ${allowance} ${token.symbol}`)
     expect(allowance).toBeGreaterThanOrEqual(0)
-  })
+  }, 10000)
 
   it.skip('should approve spender for new allowance', async () => {
     const { value: currentAllowance } = await ERC20Util.fetchAllowance(
