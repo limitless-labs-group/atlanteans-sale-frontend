@@ -1,14 +1,13 @@
-import { useAtlanteansSaleContract } from '@/contracts'
-import { useLogger } from '@/hooks'
+import { useLogger, useAtlanteansSaleContract } from '@/hooks'
 import { useQuery } from '@tanstack/react-query'
 
-export const useFinalPrice = () => {
-  const log = useLogger(useFinalPrice.name)
+export const useCurrentDAPrice = () => {
+  const log = useLogger(useCurrentDAPrice.name)
   const atlanteansSale = useAtlanteansSaleContract()
 
   const query = useQuery({
     queryKey: ['current-da-price-query'],
-    queryFn: () => atlanteansSale.finalPrice(),
+    queryFn: () => atlanteansSale.currentDaPrice(),
     onError: (error) => {
       log.error({ error })
     },

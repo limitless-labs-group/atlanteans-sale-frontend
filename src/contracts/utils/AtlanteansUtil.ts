@@ -1,5 +1,5 @@
-import { DEFAULT_CHAIN, SupportedChainId } from '@/constants'
-import { ATLANTEANS_CONTRACT_ADDRESS, Atlanteans, Atlanteans__factory } from '@/contracts'
+import { DEFAULT_CHAIN, SupportedChainId, ATLANTEANS_CONTRACT_ADDRESS } from '@/constants'
+import { Atlanteans, Atlanteans__factory } from '@/contracts'
 import { SignerOrProvider } from '@/types'
 import { getChain, getProvider } from '@/utils'
 

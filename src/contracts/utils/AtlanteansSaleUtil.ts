@@ -5,8 +5,8 @@ import {
   SupportedChainId,
   SalePhase,
   DEFAULT_CHAIN,
+  ATLANTEANS_SALE_CONTRACT_ADDRESS,
 } from '@/constants'
-import { ATLANTEANS_SALE_CONTRACT_ADDRESS } from '@/contracts/constants'
 import { AtlanteansSale__factory, AtlanteansSale } from '@/contracts/types'
 import { Signer, SignerOrProvider, ContractTransaction, MerkleProof } from '@/types'
 import { getChain, getProvider } from '@/utils'

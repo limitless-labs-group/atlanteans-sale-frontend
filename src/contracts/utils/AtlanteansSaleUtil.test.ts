@@ -1,5 +1,9 @@
-import { MINT_LIMIT_TOTAL, SalePhase, TESTNET_CHAIN } from '@/constants'
-import { ATLANTEANS_SALE_CONTRACT_ADDRESS } from '@/contracts/constants'
+import {
+  MINT_LIMIT_TOTAL,
+  SalePhase,
+  ATLANTEANS_SALE_CONTRACT_ADDRESS,
+  TESTNET_CHAIN,
+} from '@/constants'
 import { AtlanteansSale } from '@/contracts/types'
 import { AtlanteansSaleUtil, MintError } from '@/contracts/utils/AtlanteansSaleUtil'
 import { getProvider } from '@/utils'

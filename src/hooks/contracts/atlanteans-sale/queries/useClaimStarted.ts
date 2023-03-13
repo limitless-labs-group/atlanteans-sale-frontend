@@ -1,5 +1,4 @@
-import { useAtlanteansSaleContract } from '@/contracts'
-import { useLogger } from '@/hooks'
+import { useLogger, useAtlanteansSaleContract } from '@/hooks'
 import { useQuery } from '@tanstack/react-query'
 
 export const useClaimStarted = () => {
