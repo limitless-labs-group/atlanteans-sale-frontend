@@ -4,24 +4,24 @@ import { useLogger } from '@/hooks'
 import { useMutation } from 'react-query'
 import { useSigner } from 'wagmi'
 
-interface IFetchProof {
+interface IFetchSignature {
   salePhase: SalePhase
 }
 
-export const useFetchProof = () => {
-  const log = useLogger(useFetchProof.name)
+export const useFetchSignature = () => {
+  const log = useLogger(useFetchSignature.name)
 
   const { data: signer } = useSigner()
 
   const mutation = useMutation({
-    mutationFn: async ({ salePhase }: IFetchProof) => {
+    mutationFn: async ({ salePhase }: IFetchSignature) => {
       if (!signer) {
         return undefined
       }
       const message = await AtlanteansAPI.fetchMessageToSign(salePhase)
       const messageSigned = await signer.signMessage(message) // waiting for user to sign msg in wallet
-      const proof = await AtlanteansAPI.fetchProof(salePhase, message, messageSigned)
-      return proof
+      const signature = await AtlanteansAPI.fetchSignature(salePhase, message, messageSigned)
+      return signature
     },
     onError: (error: any, variables, context) => {
       log.error({ error, variables, context })
