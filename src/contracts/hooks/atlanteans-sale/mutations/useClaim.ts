@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { useToast, useLogger, useNetwork, useFetchProof } from '@/hooks'
+import { useToast, useLogger, useNetwork, useFetchSignature } from '@/hooks'
 import { AtlanteansSaleUtil } from '@/contracts'
 import { useSigner } from 'wagmi'
 import { SalePhase } from '@/constants'
@@ -13,22 +13,22 @@ export const useClaim = () => {
 
   const { isActiveChainSupported } = useNetwork()
   const { data: signer } = useSigner()
-  const { mutateAsync: fetchProof } = useFetchProof()
+  const { mutateAsync: fetchSignature } = useFetchSignature()
 
   const mutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (tokenAmount: number) => {
       if (!isActiveChainSupported || !signer) {
         // TODO: toast error
         return
       }
 
-      const proof = await fetchProof({ salePhase: SalePhase.WL })
-      if (!proof) {
+      const signature = await fetchSignature({ salePhase: SalePhase.WL })
+      if (!signature) {
         // TODO: toast error
-        return undefined
+        return
       }
 
-      const { tx, error } = await AtlanteansSaleUtil.claim({ signer, proof })
+      const { tx, error } = await AtlanteansSaleUtil.claim({ signer, signature, tokenAmount })
       // TODO: toast error
       return tx
     },

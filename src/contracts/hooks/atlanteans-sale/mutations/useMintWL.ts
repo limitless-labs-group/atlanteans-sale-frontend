@@ -19,13 +19,13 @@ export const useMintWL = () => {
     mutationFn: async (tokenAmount: number) => {
       if (!isActiveChainSupported || !signer) {
         // TODO: toast error
-        return undefined
+        return
       }
 
       const proof = await fetchProof({ salePhase: SalePhase.WL })
       if (!proof) {
         // TODO: toast error
-        return undefined
+        return
       }
 
       const { tx, error } = await AtlanteansSaleUtil.mintWL({ signer, tokenAmount, proof })

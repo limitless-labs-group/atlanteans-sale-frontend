@@ -9,7 +9,7 @@ export const WETH: { [chainId in SupportedChainId]: Token } = {
     name: 'Wrapped Ether',
   },
   [TESTNET_CHAIN?.id]: {
-    address: '0xb3C45Cfc3DB077E0EB9bC4565bAd16AAAe83b932',
+    address: '0xF7C852175fCB4Ef2a33B9481151aCD5B9411A16F',
     symbol: 'wETH',
     decimals: 18,
     name: 'Wrapped Ether (Testnet)',

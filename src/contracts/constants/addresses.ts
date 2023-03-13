@@ -2,11 +2,11 @@ import { MAINNET_CHAIN, SupportedChainId, TESTNET_CHAIN } from '@/constants'
 import { Address } from 'wagmi'
 
 export const ATLANTEANS_CONTRACT_ADDRESS: { [chainId in SupportedChainId]: Address } = {
-  [TESTNET_CHAIN?.id]: '0x4B028F5E138D2FDFB8A5F2a5a1fe643749Fbb3Df',
+  [TESTNET_CHAIN?.id]: '0xE6a3f6E572363C963Df6EE0D341F6C86d9d40017',
   [MAINNET_CHAIN?.id]: '0x',
 }
 
 export const ATLANTEANS_SALE_CONTRACT_ADDRESS: { [chainId in SupportedChainId]: Address } = {
-  [TESTNET_CHAIN?.id]: '0xe61347A7649D262b2Bcf60F10c956711D50C23Bb',
+  [TESTNET_CHAIN?.id]: '0x100F30d0dBA80b6f3af9401c96a7a30895726C5e',
   [MAINNET_CHAIN?.id]: '0x',
 }

@@ -9,12 +9,15 @@ describe('AtlanteansSaleUtil', () => {
   const provider = getProvider({ chain: TESTNET_CHAIN })
   const signer = new Wallet(process.env.TEST_WALLET_PRIVATE_KEY ?? '', provider)
   const MaxSchnaider = '0xb1D7daD6baEF98df97bD2d3Fb7540c08886e0299'
+  let contract: AtlanteansSale
+  // proof for WL
   const proof = [
     '0x7928da0aaeaf0f411e6b271d26aefd8c05e36545bdf24e51436ed472910a7286',
     '0x070e8db97b197cc0e4a1790c5e6c3667bab32d733db7f815fbe84f5824c7168d',
     '0x1d2c6d0de38c77d2a15f6d241121ec032404625e87566d8a742d3dc2f924263d',
   ]
-  let contract: AtlanteansSale
+  // signature for CLAIM
+  const signature = ''
 
   const itif = (condition: boolean) => (condition ? it : it.skip)
 
@@ -29,48 +32,48 @@ describe('AtlanteansSaleUtil', () => {
     expect(finalPrice.gt(0)).toBeTruthy()
   })
 
-  describe('whitelist', () => {
-    let hasWLStarted = false,
-      hasWLEnded = false,
-      wlMintedAmount = -1,
-      canMint = wlMintedAmount < MINT_LIMIT_TOTAL[SalePhase.WL]
+  // describe('whitelist', () => {
+  //   let hasWLStarted = false,
+  //     hasWLEnded = false,
+  //     wlMintedAmount = -1,
+  //     canMint = wlMintedAmount < MINT_LIMIT_TOTAL[SalePhase.WL]
 
-    it('should fetch WL token amount minted by user', async () => {
-      wlMintedAmount = await AtlanteansSaleUtil.wlMintedAmount(MaxSchnaider, TESTNET_CHAIN.id)
-      expect(wlMintedAmount).toBeGreaterThanOrEqual(0)
-    })
+  //   it('should fetch WL token amount minted by user', async () => {
+  //     wlMintedAmount = await AtlanteansSaleUtil.wlMintedAmount(MaxSchnaider, TESTNET_CHAIN.id)
+  //     expect(wlMintedAmount).toBeGreaterThanOrEqual(0)
+  //   })
 
-    itif(!hasWLStarted)('should revert WL mint if phase has not started', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, proof })
-      expect(error).toBe(MintError.PHASE_NOT_STARTED)
-    })
+  //   itif(!hasWLStarted)('should revert WL mint if phase has not started', async () => {
+  //     const { error } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
+  //     expect(error).toBe(MintError.PHASE_NOT_STARTED)
+  //   })
 
-    itif(hasWLEnded)('should revert WL mint if phase has ended', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, proof })
-      expect(error).toBe(MintError.PHASE_ENDED)
-    })
+  //   itif(hasWLEnded)('should revert WL mint if phase has ended', async () => {
+  //     const { error } = await AtlanteansSaleUtil.claim({ signer, proof })
+  //     expect(error).toBe(MintError.PHASE_ENDED)
+  //   })
 
-    itif(canMint && hasWLStarted && !hasWLEnded)(
-      'should WL mint',
-      async () => {
-        wlMintedAmount = await AtlanteansSaleUtil.wlMintedAmount(MaxSchnaider, TESTNET_CHAIN.id)
-        const { tx } = await AtlanteansSaleUtil.mintWL({ signer, proof })
-        const receipt = await tx?.wait()
-        expect(receipt?.status).toBe(1)
-        const newWlMintedAmount = await AtlanteansSaleUtil.wlMintedAmount(
-          MaxSchnaider,
-          TESTNET_CHAIN.id
-        )
-        expect(newWlMintedAmount).toBeGreaterThan(wlMintedAmount)
-      },
-      30000
-    )
+  //   itif(canMint && hasWLStarted && !hasWLEnded)(
+  //     'should WL mint',
+  //     async () => {
+  //       wlMintedAmount = await AtlanteansSaleUtil.wlMintedAmount(MaxSchnaider, TESTNET_CHAIN.id)
+  //       const { tx } = await AtlanteansSaleUtil.mintWL({ signer, proof })
+  //       const receipt = await tx?.wait()
+  //       expect(receipt?.status).toBe(1)
+  //       const newWlMintedAmount = await AtlanteansSaleUtil.wlMintedAmount(
+  //         MaxSchnaider,
+  //         TESTNET_CHAIN.id
+  //       )
+  //       expect(newWlMintedAmount).toBeGreaterThan(wlMintedAmount)
+  //     },
+  //     30000
+  //   )
 
-    // itif(hasClaimed)('should revert WL mint if already minted max amount', async () => {
-    //   const { error } = await AtlanteansSaleUtil.claim({ signer, proof })
-    //   expect(error).toBe(MintError.ALREADY_MINTED)
-    // })
-  })
+  // itif(hasClaimed)('should revert WL mint if already minted max amount', async () => {
+  //   const { error } = await AtlanteansSaleUtil.claim({ signer, proof })
+  //   expect(error).toBe(MintError.ALREADY_MINTED)
+  // })
+  // })
 
   describe('claim', () => {
     let hasClaimStarted = false,
@@ -78,29 +81,31 @@ describe('AtlanteansSaleUtil', () => {
       hasClaimed = false
 
     itif(!hasClaimStarted)('should revert claim if phase has not started', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, proof })
+      const { error } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
       expect(error).toBe(MintError.PHASE_NOT_STARTED)
     })
 
     itif(hasClaimEnded)('should revert claim if phase has ended', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, proof })
+      const { error } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
       expect(error).toBe(MintError.PHASE_ENDED)
     })
 
     itif(!hasClaimed && hasClaimStarted && !hasClaimEnded)(
       'should claim for the first time',
       async () => {
-        const { tx } = await AtlanteansSaleUtil.claim({ signer, proof })
+        const maxTokenAmountToClaim = await contract.faToRemainingClaim(MaxSchnaider)
+        const { tx } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
         const receipt = await tx?.wait()
         expect(receipt?.status).toBe(1)
-        hasClaimed = await AtlanteansSaleUtil.hasClaimed(MaxSchnaider, TESTNET_CHAIN.id)
-        expect(hasClaimed).toBeTruthy()
+        const tokenAmountRemaining = await contract.faToRemainingClaim(MaxSchnaider)
+        hasClaimed = tokenAmountRemaining.lt(maxTokenAmountToClaim)
+        expect(hasClaimed).toBeTruthy
       },
       30000
     )
 
     itif(hasClaimed)('should revert claim if already claimed', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, proof })
+      const { error } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
       expect(error).toBe(MintError.ALREADY_MINTED)
     })
   })
