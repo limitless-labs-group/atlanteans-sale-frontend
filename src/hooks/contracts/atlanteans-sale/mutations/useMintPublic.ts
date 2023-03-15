@@ -14,13 +14,13 @@ export const useMintPublic = () => {
   const { data: signer } = useSigner()
 
   const mutation = useMutation({
-    mutationFn: async (tokenAmount: number) => {
+    mutationFn: async (quantity: number) => {
       if (!isActiveChainSupported || !signer) {
         // TODO: toast error
         return
       }
 
-      const { tx, error } = await AtlanteansSaleUtil.mintPublic({ signer, tokenAmount })
+      const { tx, error } = await AtlanteansSaleUtil.mintPublic({ signer, quantity })
       // TODO: toast error
       return tx
     },

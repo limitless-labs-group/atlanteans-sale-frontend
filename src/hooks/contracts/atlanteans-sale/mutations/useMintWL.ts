@@ -16,7 +16,7 @@ export const useMintWL = () => {
   const { mutateAsync: fetchProof } = useFetchProof()
 
   const mutation = useMutation({
-    mutationFn: async (tokenAmount: number) => {
+    mutationFn: async (quantity: number) => {
       if (!isActiveChainSupported || !signer) {
         // TODO: toast error
         return
@@ -28,7 +28,7 @@ export const useMintWL = () => {
         return
       }
 
-      const { tx, error } = await AtlanteansSaleUtil.mintWL({ signer, tokenAmount, proof })
+      const { tx, error } = await AtlanteansSaleUtil.mintWL({ signer, quantity, proof })
       // TODO: toast error
       return tx
     },

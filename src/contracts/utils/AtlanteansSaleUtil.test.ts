@@ -48,7 +48,7 @@ describe('AtlanteansSaleUtil', () => {
   //   })
 
   //   itif(!hasWLStarted)('should revert WL mint if phase has not started', async () => {
-  //     const { error } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
+  //     const { error } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
   //     expect(error).toBe(MintError.PHASE_NOT_STARTED)
   //   })
 
@@ -85,31 +85,31 @@ describe('AtlanteansSaleUtil', () => {
       hasClaimed = false
 
     itif(!hasClaimStarted)('should revert claim if phase has not started', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
+      const { error } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
       expect(error).toBe(MintError.PHASE_NOT_STARTED)
     })
 
     itif(hasClaimEnded)('should revert claim if phase has ended', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
+      const { error } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
       expect(error).toBe(MintError.PHASE_ENDED)
     })
 
     itif(!hasClaimed && hasClaimStarted && !hasClaimEnded)(
       'should claim for the first time',
       async () => {
-        const maxTokenAmountToClaim = await contract.faToRemainingClaim(MaxSchnaider)
-        const { tx } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
+        const maxQuantityToClaim = await contract.faToRemainingClaim(MaxSchnaider)
+        const { tx } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
         const receipt = await tx?.wait()
         expect(receipt?.status).toBe(1)
-        const tokenAmountRemaining = await contract.faToRemainingClaim(MaxSchnaider)
-        hasClaimed = tokenAmountRemaining.lt(maxTokenAmountToClaim)
+        const quantityRemaining = await contract.faToRemainingClaim(MaxSchnaider)
+        hasClaimed = quantityRemaining.lt(maxQuantityToClaim)
         expect(hasClaimed).toBeTruthy
       },
       30000
     )
 
     itif(hasClaimed)('should revert claim if already claimed', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, tokenAmount: 1, signature })
+      const { error } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
       expect(error).toBe(MintError.ALREADY_MINTED)
     })
   })

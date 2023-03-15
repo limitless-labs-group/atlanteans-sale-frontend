@@ -31,7 +31,7 @@ export enum MintError {
 
 interface IAtlanteansSaleUtilMint {
   signer: Signer
-  tokenAmount: number
+  quantity: number
 }
 interface IAtlanteansSaleUtilMintWithProof extends IAtlanteansSaleUtilMint {
   proof: MerkleProof
@@ -103,7 +103,7 @@ export class AtlanteansSaleUtil {
   static mintWL = async ({
     signer,
     proof,
-    tokenAmount = 1,
+    quantity = 1,
   }: IAtlanteansSaleUtilMintWithProof): IAtlanteansSaleUtilMintResponse => {
     const address = await signer.getAddress()
     const chainId = await signer.getChainId()
@@ -112,27 +112,27 @@ export class AtlanteansSaleUtil {
       chainId,
     })
 
-    const tokenAmountMinted = await this.wlMintedAmount(address, chainId)
-    const tokenAmountRemaining = MINT_LIMIT_TOTAL[SalePhase.WL] - tokenAmountMinted
-    const maxTokenAmountPerTx = MINT_LIMIT_PER_TX[SalePhase.WL]
-    if (tokenAmountRemaining <= 0) {
+    const quantityMinted = await this.wlMintedAmount(address, chainId)
+    const quantityRemaining = MINT_LIMIT_TOTAL[SalePhase.WL] - quantityMinted
+    const maxQuantityPerTx = MINT_LIMIT_PER_TX[SalePhase.WL]
+    if (quantityRemaining <= 0) {
       return {
         error: MintError.ALREADY_MINTED,
       }
     }
-    if (tokenAmount > tokenAmountRemaining) {
+    if (quantity > quantityRemaining) {
       return {
-        error: MintError.LIMIT_TOTAL.replace('LIMIT_TO_REPLACE', tokenAmountRemaining.toString()),
+        error: MintError.LIMIT_TOTAL.replace('LIMIT_TO_REPLACE', quantityRemaining.toString()),
       }
     }
-    if (tokenAmount > maxTokenAmountPerTx) {
+    if (quantity > maxQuantityPerTx) {
       return {
-        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxTokenAmountPerTx.toString()),
+        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxQuantityPerTx.toString()),
       }
     }
 
     const tokenPrice = await contract.mintlistPrice()
-    const totalPrice = tokenPrice.mul(tokenAmount)
+    const totalPrice = tokenPrice.mul(quantity)
 
     const nonce = await signer.getTransactionCount()
 
@@ -147,12 +147,12 @@ export class AtlanteansSaleUtil {
 
   static mintDA = async ({
     signer,
-    tokenAmount = 1,
+    quantity = 1,
   }: IAtlanteansSaleUtilMint): IAtlanteansSaleUtilMintResponse => {
-    const maxTokenAmountPerTx = MINT_LIMIT_PER_TX[SalePhase.DA]
-    if (tokenAmount > maxTokenAmountPerTx) {
+    const maxQuantityPerTx = MINT_LIMIT_PER_TX[SalePhase.DA]
+    if (quantity > maxQuantityPerTx) {
       return {
-        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxTokenAmountPerTx.toString()),
+        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxQuantityPerTx.toString()),
       }
     }
 
@@ -163,11 +163,11 @@ export class AtlanteansSaleUtil {
     })
 
     const tokenPrice = await contract.currentDaPrice()
-    const totalPrice = tokenPrice.mul(tokenAmount)
+    const totalPrice = tokenPrice.mul(quantity)
 
     const nonce = await signer.getTransactionCount()
 
-    const tx = await contract['bidSummon(uint256)'](tokenAmount, {
+    const tx = await contract['bidSummon(uint256)'](quantity, {
       value: totalPrice,
       gasLimit: MINT_GAS_LIMIT,
       nonce,
@@ -178,12 +178,12 @@ export class AtlanteansSaleUtil {
 
   static mintPublic = async ({
     signer,
-    tokenAmount = 1,
+    quantity = 1,
   }: IAtlanteansSaleUtilMint): IAtlanteansSaleUtilMintResponse => {
-    const maxTokenAmountPerTx = MINT_LIMIT_PER_TX[SalePhase.PUBLIC]
-    if (tokenAmount > maxTokenAmountPerTx) {
+    const maxQuantityPerTx = MINT_LIMIT_PER_TX[SalePhase.PUBLIC]
+    if (quantity > maxQuantityPerTx) {
       return {
-        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxTokenAmountPerTx.toString()),
+        error: MintError.LIMIT_PER_TX.replace('LIMIT_TO_REPLACE', maxQuantityPerTx.toString()),
       }
     }
 
@@ -194,11 +194,11 @@ export class AtlanteansSaleUtil {
     })
 
     const tokenPrice = await contract.finalPrice()
-    const totalPrice = tokenPrice.mul(tokenAmount)
+    const totalPrice = tokenPrice.mul(quantity)
 
     const nonce = await signer.getTransactionCount()
 
-    const tx = await contract['publicSummon(uint256)'](tokenAmount, {
+    const tx = await contract['publicSummon(uint256)'](quantity, {
       value: totalPrice,
       gasLimit: MINT_GAS_LIMIT,
       nonce,
@@ -209,7 +209,7 @@ export class AtlanteansSaleUtil {
 
   static claim = async ({
     signer,
-    tokenAmount,
+    quantity,
     signature,
   }: IAtlanteansSaleUtilMintWithSignature): IAtlanteansSaleUtilMintResponse => {
     const [address, chainId] = await Promise.all([signer.getAddress(), signer.getChainId()])
@@ -218,7 +218,7 @@ export class AtlanteansSaleUtil {
       chainId,
     })
 
-    const [hasClaimStarted, hasClaimEnded, tokenAmountRemaining] = await Promise.all([
+    const [hasClaimStarted, hasClaimEnded, quantityRemaining] = await Promise.all([
       contract.claimsStarted(),
       contract.claimsEnded(),
       contract.faToRemainingClaim(address),
@@ -234,20 +234,20 @@ export class AtlanteansSaleUtil {
         error: MintError.PHASE_NOT_STARTED,
       }
     }
-    if (tokenAmountRemaining.lte(0)) {
+    if (quantityRemaining.lte(0)) {
       return {
         error: MintError.ALREADY_MINTED,
       }
     }
-    if (tokenAmountRemaining.lt(tokenAmount)) {
+    if (quantityRemaining.lt(quantity)) {
       return {
-        error: MintError.LIMIT_TOTAL.replace('LIMIT_TO_REPLACE', tokenAmountRemaining.toString()),
+        error: MintError.LIMIT_TOTAL.replace('LIMIT_TO_REPLACE', quantityRemaining.toString()),
       }
     }
 
     const nonce = await signer.getTransactionCount()
 
-    const tx = await contract.claimSummon(signature, tokenAmount, {
+    const tx = await contract.claimSummon(signature, quantity, {
       gasLimit: MINT_GAS_LIMIT,
       nonce,
     })

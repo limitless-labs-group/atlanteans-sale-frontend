@@ -16,7 +16,7 @@ export const useClaim = () => {
   const { mutateAsync: fetchSignature } = useFetchSignature()
 
   const mutation = useMutation({
-    mutationFn: async (tokenAmount: number) => {
+    mutationFn: async (quantity: number) => {
       if (!isActiveChainSupported || !signer) {
         // TODO: toast error
         return
@@ -28,7 +28,7 @@ export const useClaim = () => {
         return
       }
 
-      const { tx, error } = await AtlanteansSaleUtil.claim({ signer, signature, tokenAmount })
+      const { tx, error } = await AtlanteansSaleUtil.claim({ signer, signature, quantity })
       // TODO: toast error
       return tx
     },

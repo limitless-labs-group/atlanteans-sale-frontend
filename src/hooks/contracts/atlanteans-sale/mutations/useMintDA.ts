@@ -14,13 +14,13 @@ export const useMintDA = () => {
   const { data: signer } = useSigner()
 
   const mutation = useMutation({
-    mutationFn: async (tokenAmount: number) => {
+    mutationFn: async (quantity: number) => {
       if (!isActiveChainSupported || !signer) {
         // TODO: toast error
         return
       }
 
-      const { tx, error } = await AtlanteansSaleUtil.mintDA({ signer, tokenAmount })
+      const { tx, error } = await AtlanteansSaleUtil.mintDA({ signer, quantity })
       // TODO: toast error
       return tx
     },
