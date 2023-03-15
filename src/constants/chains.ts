@@ -10,14 +10,6 @@ export const TESTNET_CHAIN: Chain = Object.freeze({
     decimals: 18,
   },
   rpcUrls: {
-    alchemy: {
-      http: ['https://polygon-mumbai.g.alchemy.com/v2'],
-      webSocket: ['wss://polygon-mumbai.g.alchemy.com/v2'],
-    },
-    infura: {
-      http: ['https://polygon-mumbai.infura.io/v3'],
-      webSocket: ['wss://polygon-mumbai.infura.io/ws/v3'],
-    },
     default: {
       http: ['https://matic-mumbai.chainstacklabs.com'],
     },
@@ -47,16 +39,8 @@ export const MAINNET_CHAIN: Chain = Object.freeze({
     decimals: 18,
   },
   rpcUrls: {
-    alchemy: {
-      http: ['https://eth-mainnet.g.alchemy.com/v2'],
-      webSocket: ['wss://eth-mainnet.g.alchemy.com/v2'],
-    },
-    infura: {
-      http: ['https://mainnet.infura.io/v3'],
-      webSocket: ['wss://mainnet.infura.io/ws/v3'],
-    },
     default: {
-      http: ['https://cloudflare-eth.com'],
+      http: [process.env.NEXT_PUBLIC_RPC_URL ?? 'https://cloudflare-eth.com'],
     },
     public: {
       http: ['https://cloudflare-eth.com'],
