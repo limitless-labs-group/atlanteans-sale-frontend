@@ -3,26 +3,23 @@ import { useLocalStorage } from '@/hooks'
 import { Flex, Heading, HStack, Stack, Text } from '@chakra-ui/react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 
-type Slide = { name: string; description: string; imageSrc: string }
+type Slide = { heading: string; text: string; imageSrc: string }
 const slides: Slide[] = [
   {
-    name: 'The Humans',
-    description:
-      'Story about humans story about humans story about humans story about humans story about humans story about humans story about humans story about humans story about humans story about humans story about humans.',
+    heading: 'The Humans',
+    text: 'Story about humans story about humans story about humans story about humans story about humans story about humans story about humans story about humans story about humans story about humans story about humans.',
     imageSrc: '/assets/images/story-example.jpg',
   },
   {
-    name: 'The Ancients',
-    description:
-      'Story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients.',
+    heading: 'The Ancients',
+    text: 'Story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients story about ancients.',
     imageSrc: '/assets/images/story-example.jpg',
   },
   {
-    name: 'The Divines',
-    description:
-      'Story about divines story about divines story about divines story about divines story about divines story about divines story!',
+    heading: 'The Divines',
+    text: 'Story about divines story about divines story about divines story about divines story about divines story about divines story!',
     imageSrc: '/assets/images/story-example.jpg',
   },
 ]
@@ -74,7 +71,7 @@ const StoryPage = () => {
       border='12px solid transparent'
       style={{ borderImage: 'url("/assets/images/textures/pixel-border-image.png") 12 stretch' }}
     >
-      <Image src={currentSlide.imageSrc} alt={currentSlide.name} width={1920} height={1080} />
+      <Image src={currentSlide.imageSrc} alt={currentSlide.heading} width={1920} height={1080} />
     </Flex>
   )
   const Dialog = () => (
@@ -90,8 +87,8 @@ const StoryPage = () => {
       style={{ borderImage: 'url("/assets/images/textures/pixel-border-gray.png") 12 stretch' }}
     >
       <Stack w='full' spacing='16px'>
-        <Heading fontSize='24px'>{currentSlide.name}</Heading>
-        <Text fontSize='20px'>{currentSlide.description}</Text>
+        <Heading fontSize='24px'>{currentSlide.heading}</Heading>
+        <Text fontSize='20px'>{currentSlide.text}</Text>
       </Stack>
     </Flex>
   )
