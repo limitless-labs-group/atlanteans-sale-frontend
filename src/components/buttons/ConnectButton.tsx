@@ -28,7 +28,11 @@ export const ConnectButton = () => (
                 </Button>
               )
             }
-            return <Button onClick={openAccountModal}>{account.displayName}</Button>
+            return (
+              <Button onClick={openAccountModal} width='auto'>
+                {account.displayName}
+              </Button>
+            )
           })()}
         </div>
       )

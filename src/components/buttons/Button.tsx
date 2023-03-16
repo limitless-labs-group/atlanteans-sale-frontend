@@ -5,12 +5,14 @@ export interface IButton extends ButtonProps {
   colorScheme?: 'aqua' | 'yellow'
   size?: 'sm' | 'md' | 'lg'
   variant?: 'default' | 'squar'
+  width?: 'auto' | number
 }
 
 export const Button = ({
   children,
   variant = 'default',
   size = 'sm',
+  width: width_,
   colorScheme = 'aqua',
   ...props
 }: IButton) => {
@@ -25,7 +27,7 @@ export const Button = ({
         return 64
     }
   }, [size])
-  const width = height * sizeRatio
+  const width = width_ ?? `${height * sizeRatio}px`
   const fontSize = useMemo(() => {
     switch (size) {
       case 'sm':
@@ -43,7 +45,7 @@ export const Button = ({
       display='inline-flex'
       color='black'
       p={4}
-      w={`${width}px`}
+      w={width}
       h={`${height}px`}
       bg={`atlanteans.${colorScheme}`}
       border='10px solid transparent'

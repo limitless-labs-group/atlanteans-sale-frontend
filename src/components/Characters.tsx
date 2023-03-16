@@ -127,10 +127,8 @@ export const Characters = ({ ...props }: ICharacters) => {
         bottom='70px'
       >
         <>
-          <Text>
-            {`A number of pleasure, it's mirror in fact,
-            Reverse and input, then flirt with me back...`}
-          </Text>
+          <Text>{`A number of pleasure, it's mirror in fact`}</Text>
+          <Text>{`Reverse and input, then flirt with me back...`}</Text>
           <Buttons />
           <Character />
         </>
