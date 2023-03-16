@@ -1,3 +1,4 @@
+import { TEXTURES_BASE_DIR } from '@/constants'
 import { Button as ChakraButton, ButtonProps } from '@chakra-ui/react'
 import { useMemo } from 'react'
 
@@ -5,14 +6,13 @@ export interface IButton extends ButtonProps {
   colorScheme?: 'aqua' | 'yellow'
   size?: 'sm' | 'md' | 'lg'
   variant?: 'default' | 'squar'
-  width?: 'auto' | number
 }
 
 export const Button = ({
   children,
   variant = 'default',
   size = 'sm',
-  width: width_,
+  width: w,
   colorScheme = 'aqua',
   ...props
 }: IButton) => {
@@ -27,7 +27,7 @@ export const Button = ({
         return 64
     }
   }, [size])
-  const width = width_ ?? `${height * sizeRatio}px`
+  const width = w ?? `${height * sizeRatio}px`
   const fontSize = useMemo(() => {
     switch (size) {
       case 'sm':
@@ -51,7 +51,7 @@ export const Button = ({
       border='10px solid transparent'
       borderRadius={height / 2}
       style={{
-        borderImage: `url('/assets/images/textures/pixel-border-${colorScheme}.png') 40 stretch`,
+        borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-${colorScheme}.png') 40 stretch`,
       }}
       fontSize={fontSize}
       _hover={{ transform: 'scale(1.02)' }}

@@ -1,4 +1,5 @@
 export * as AtlantisWorldLogo from './icons/atlantis-world-logo.png'
+export * as AtlantisWorldSmallLogo from './icons/atlantis-world-logo-small.png'
 export * as DiscordIcon from './icons/discord.svg'
 export * as OpenseaIcon from './icons/opensea.svg'
 export * as TelegramIcon from './icons/telegram.svg'

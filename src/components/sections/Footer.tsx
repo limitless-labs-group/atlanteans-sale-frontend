@@ -1,5 +1,5 @@
 import { Newsletter, SocialButtons } from '@/components'
-import { Divider, HStack, Link, VStack, Text } from '@chakra-ui/react'
+import { Divider, Stack, Link, VStack, Text } from '@chakra-ui/react'
 
 type Tab = { name: string; href: string }
 const tabs: Tab[] = [
@@ -13,7 +13,13 @@ const tabs: Tab[] = [
 
 export const Footer = () => {
   const Tabs = () => (
-    <HStack spacing={8} h='full' my={10}>
+    <Stack
+      spacing={{ base: 6, md: 8 }}
+      direction={{ base: 'column', md: 'row' }}
+      h='full'
+      my={10}
+      alignItems='center'
+    >
       {tabs.map((tab) => (
         <Link
           key={tab.name}
@@ -26,13 +32,22 @@ export const Footer = () => {
           <Text>{tab.name}</Text>
         </Link>
       ))}
-    </HStack>
+    </Stack>
   )
   const Copyright = () => <Text opacity='0.420'>© 2023 Atlantis World. All Rights Reserved.</Text>
 
   return (
-    <VStack bg='atlanteans.aquaDark' w='full' maxW='1440px' p='75px' spacing='50px'>
-      <Newsletter mb='10px' />
+    <VStack
+      bg='atlanteans.aquaDark'
+      w='full'
+      maxW='1440px'
+      pt={{ base: '50px', md: '75px' }}
+      pb={{ base: '40px', md: '75px' }}
+      px={{ base: '24px', md: '50px', xl: '75px' }}
+      spacing={{ base: '40px', md: '50px' }}
+      textAlign='center'
+    >
+      <Newsletter mb='10px' w={{ base: 'full', md: 'unset' }} />
       <Divider />
       <Tabs />
       <SocialButtons variant='round' />

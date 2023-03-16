@@ -1,12 +1,14 @@
 import { Button } from '@/components'
+import { TEXTURES_BASE_DIR } from '@/constants'
 import {
   FormControl,
   FormErrorMessage,
   FormHelperText,
   Heading,
-  HStack,
+  Stack,
   Input,
   StackProps,
+  HStack,
 } from '@chakra-ui/react'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -43,11 +45,17 @@ export const Newsletter = ({ onSubmit, ...props }: INewsletter) => {
   }, [email])
 
   return (
-    <HStack h='56px' spacing={8} {...props}>
+    <Stack
+      // lineHeight='56px'
+      direction={{ base: 'column', md: 'row' }}
+      alignItems='center'
+      spacing={8}
+      {...props}
+    >
       <Heading size='16px' textTransform='uppercase'>
         Newsletter
       </Heading>
-      <HStack spacing={-6} h='full'>
+      <HStack spacing={-6} h='56px' w='full'>
         <FormControl h='full' isInvalid={isInvalid}>
           <Input
             type='email'
@@ -56,7 +64,7 @@ export const Newsletter = ({ onSubmit, ...props }: INewsletter) => {
             bg='transparent'
             border='10px solid transparent'
             style={{
-              borderImage: `url('/assets/images/textures/pixel-border-input.png') 10 stretch`,
+              borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-gray.png') 10 stretch`,
             }}
             _focus={{ boxShadow: 'none' }}
             _invalid={{ boxShadow: 'none' }}
@@ -80,6 +88,6 @@ export const Newsletter = ({ onSubmit, ...props }: INewsletter) => {
           {'⇝'}
         </Button>
       </HStack>
-    </HStack>
+    </Stack>
   )
 }

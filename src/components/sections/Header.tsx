@@ -1,7 +1,18 @@
-import { AtlantisWorldLogo } from 'public/assets/images'
 import { ConnectButton, SocialButtons } from '@/components'
-import { Flex, HStack, Link, Text } from '@chakra-ui/react'
-import Image from 'next/image'
+import { ICONS_BASE_DIR, TEXTURES_BASE_DIR } from '@/constants'
+import {
+  Flex,
+  HStack,
+  IconButton,
+  Image,
+  Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Stack,
+  Text,
+} from '@chakra-ui/react'
 import NavigationLink from 'next/link'
 
 type Tab = { name: string; href: string }
@@ -17,15 +28,30 @@ export const Header = () => {
   const Logo = () => (
     <NavigationLink href='/'>
       <Image
-        src={AtlantisWorldLogo}
-        alt='Atlantis World'
-        height={45}
-        // style={{ minHeight: '45px' }}
+        src={`${ICONS_BASE_DIR}/atlantis-world-logo-small.png`}
+        h='45px'
+        w='45px'
+        objectFit='contain'
+        display={{ base: 'none', lg: 'block', xl: 'none' }}
+        loading='lazy'
+      />
+      <Image
+        src={`${ICONS_BASE_DIR}/atlantis-world-logo.png`}
+        h='45px'
+        objectFit='contain'
+        display={{ base: 'block', lg: 'none', xl: 'block' }}
+        loading='lazy'
       />
     </NavigationLink>
   )
   const Tabs = () => (
-    <HStack h='full' spacing={0}>
+    <Stack
+      direction={{ base: 'column', lg: 'row' }}
+      display={{ base: 'none', lg: 'block' }}
+      whiteSpace='nowrap'
+      h='full'
+      spacing={0}
+    >
       {tabs.map((tab) => (
         <Link
           key={tab.name}
@@ -34,12 +60,54 @@ export const Header = () => {
           h='full'
           display='inline-flex'
           alignItems='center'
-          px={4}
+          px={{ base: 3, xl: 4 }}
         >
           <Text>{tab.name}</Text>
         </Link>
       ))}
-    </HStack>
+    </Stack>
+  )
+
+  const Burger = () => (
+    <Flex display={{ base: 'block', lg: 'none' }}>
+      <Menu>
+        <MenuButton
+          as={IconButton}
+          aria-label='Options'
+          h='50px'
+          w='50px'
+          icon={<>☰</>}
+          variant='outline'
+          fontSize='20px'
+          color='whiteAlpha.700'
+          border='10px solid transparent'
+          borderRadius='10px'
+          style={{
+            borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-gray.png') 10 stretch`,
+          }}
+        />
+        <MenuList
+          zIndex={10}
+          bg='atlanteans.aquaDark'
+          border='10px solid transparent'
+          borderRadius='20px'
+          style={{
+            borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-gray.png') 10 stretch`,
+          }}
+        >
+          {tabs.map((tab) => (
+            <Link key={tab.name} href={tab.href} isExternal>
+              <MenuItem bg='atlanteans.aquaDark' py={3}>
+                {tab.name}
+              </MenuItem>
+            </Link>
+          ))}
+          <MenuItem cursor='default' bg='atlanteans.aquaDark' py={3}>
+            <SocialButtons w='full' justifyContent='space-around' />
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    </Flex>
   )
 
   return (
@@ -47,17 +115,18 @@ export const Header = () => {
       w='full'
       maxW='1440px'
       h='55px'
-      px='75px'
-      my='35px'
+      px={{ base: '24px', md: '50px', xl: '75px' }}
+      my={{ base: '20px', md: '35px' }}
       justifyContent='space-between'
       alignItems='center'
-      gap={5}
+      gap={{ base: 2, lg: 4 }}
     >
       <Logo />
       <Tabs />
-      <HStack spacing={8} h='full'>
-        <SocialButtons />
-        <ConnectButton />
+      <HStack spacing={{ base: 0, md: 6, '2xl': 8 }} h='full'>
+        <SocialButtons spacing={{ base: 4, md: 6 }} display={{ base: 'none', lg: 'block' }} />
+        <ConnectButton display={{ base: 'none', md: 'block' }} />
+        <Burger />
       </HStack>
     </Flex>
   )
