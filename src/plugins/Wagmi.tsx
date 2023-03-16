@@ -7,11 +7,9 @@ import { connectors } from '@/plugins/RainbowKit'
 
 const { provider, webSocketProvider } = configureChains(SUPPORTED_CHAINS, [
   jsonRpcProvider({
-    rpc: () => {
-      return {
-        http: DEFAULT_CHAIN.rpcUrls.default.http[0],
-      }
-    },
+    rpc: () => ({
+      http: DEFAULT_CHAIN.rpcUrls.default.http[0],
+    }),
   }),
   publicProvider(),
 ])
