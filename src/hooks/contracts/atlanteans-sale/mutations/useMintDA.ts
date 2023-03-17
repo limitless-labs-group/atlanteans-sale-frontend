@@ -1,5 +1,5 @@
 import { useLogger, useNetwork, useToast } from '@/hooks'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from 'wagmi'
 import { useSigner } from 'wagmi'
 import { AtlanteansSaleUtil } from '@/contracts'
 

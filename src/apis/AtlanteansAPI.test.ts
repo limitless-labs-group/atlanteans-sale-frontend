@@ -11,8 +11,8 @@ describe('AtlanteansAPI', () => {
   it('should fetch message to sign', async () => {
     message = await AtlanteansAPI.fetchMessageToSign(SalePhase.CLAIM)
     messageSigned = await signer.signMessage(message)
-    // console.log(`message: ${message}`)
-    // console.log(`messageSigned: ${messageSigned}`)
+    console.log(`message: ${message}`)
+    console.log(`messageSigned: ${messageSigned}`)
     expect(message).toContain('Atlantis World')
   }, 15000)
 

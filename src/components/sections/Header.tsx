@@ -9,11 +9,13 @@ import {
   Menu,
   MenuButton,
   MenuItem,
+  MenuItemProps,
   MenuList,
   Stack,
   Text,
 } from '@chakra-ui/react'
 import NavigationLink from 'next/link'
+import { PropsWithChildren } from 'react'
 
 type Tab = { name: string; href: string }
 const tabs: Tab[] = [
@@ -68,47 +70,56 @@ export const Header = () => {
     </Stack>
   )
 
-  const Burger = () => (
-    <Flex display={{ base: 'block', lg: 'none' }}>
-      <Menu>
-        <MenuButton
-          as={IconButton}
-          aria-label='Options'
-          h='50px'
-          w='50px'
-          icon={<>☰</>}
-          variant='outline'
-          fontSize='20px'
-          color='whiteAlpha.700'
-          border='10px solid transparent'
-          borderRadius='10px'
-          style={{
-            borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-gray.png') 10 stretch`,
-          }}
-        />
-        <MenuList
-          zIndex={10}
-          bg='atlanteans.aquaDark'
-          border='10px solid transparent'
-          borderRadius='20px'
-          style={{
-            borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-gray.png') 10 stretch`,
-          }}
-        >
-          {tabs.map((tab) => (
-            <Link key={tab.name} href={tab.href} isExternal>
-              <MenuItem bg='atlanteans.aquaDark' py={3}>
-                {tab.name}
-              </MenuItem>
-            </Link>
-          ))}
-          <MenuItem cursor='default' bg='atlanteans.aquaDark' py={3}>
-            <SocialButtons w='full' justifyContent='space-around' />
-          </MenuItem>
-        </MenuList>
-      </Menu>
-    </Flex>
-  )
+  const MenuBurger = () => {
+    const MenuListItem = ({ children, ...props }: PropsWithChildren & MenuItemProps) => (
+      <MenuItem bg='atlanteans.aquaDark' py={3} {...props}>
+        {children}
+      </MenuItem>
+    )
+    return (
+      <Flex display={{ base: 'block', lg: 'none' }}>
+        <Menu>
+          <MenuButton
+            as={IconButton}
+            aria-label='Options'
+            h='50px'
+            w='50px'
+            icon={<>☰</>}
+            variant='outline'
+            fontSize='20px'
+            color='whiteAlpha.700'
+            border='10px solid transparent'
+            borderRadius='10px'
+            style={{
+              borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-gray.png') 10 stretch`,
+            }}
+            _active={{ bg: 'transparent' }}
+          />
+          <MenuList
+            zIndex={10}
+            bg='atlanteans.aquaDark'
+            border='10px solid transparent'
+            borderRadius='20px'
+            style={{
+              borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-gray.png') 10 stretch`,
+            }}
+          >
+            {tabs.map((tab) => (
+              <Link key={tab.name} href={tab.href} isExternal>
+                <MenuListItem>{tab.name}</MenuListItem>
+              </Link>
+            ))}
+            <MenuListItem cursor='default'>
+              <SocialButtons w='full' justifyContent='space-around' />
+            </MenuListItem>
+            <MenuListItem cursor='default' display={{ base: 'block', md: 'none' }}>
+              <ConnectButton w='full' />
+            </MenuListItem>
+          </MenuList>
+        </Menu>
+      </Flex>
+    )
+  }
 
   return (
     <Flex
@@ -125,8 +136,8 @@ export const Header = () => {
       <Tabs />
       <HStack spacing={{ base: 0, md: 6, '2xl': 8 }} h='full'>
         <SocialButtons spacing={{ base: 4, md: 6 }} display={{ base: 'none', lg: 'block' }} />
-        <ConnectButton display={{ base: 'none', md: 'block' }} />
-        <Burger />
+        <ConnectButton display={{ base: 'none', md: 'flex' }} />
+        <MenuBurger />
       </HStack>
     </Flex>
   )

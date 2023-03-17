@@ -1,7 +1,6 @@
-import { useMutation } from '@tanstack/react-query'
 import { useToast, useLogger, useNetwork, useFetchSignature } from '@/hooks'
 import { AtlanteansSaleUtil } from '@/contracts'
-import { useSigner } from 'wagmi'
+import { useAccount, useMutation, useSigner } from 'wagmi'
 import { SalePhase } from '@/constants'
 
 /**
@@ -11,7 +10,8 @@ export const useClaim = () => {
   const log = useLogger(useClaim.name)
   const toast = useToast()
 
-  const { isActiveChainSupported } = useNetwork()
+  const { isActiveChainSupported, activeChain } = useNetwork()
+  const { address } = useAccount()
   const { data: signer } = useSigner()
   const { mutateAsync: fetchSignature } = useFetchSignature()
 
@@ -22,13 +22,19 @@ export const useClaim = () => {
         return
       }
 
-      const signature = await fetchSignature({ salePhase: SalePhase.WL })
+      const signature = await fetchSignature({ salePhase: SalePhase.CLAIM })
       if (!signature) {
         // TODO: toast error
         return
       }
 
-      const { tx, error } = await AtlanteansSaleUtil.claim({ signer, signature, quantity })
+      const { tx, error } = await AtlanteansSaleUtil.claim({
+        address,
+        chainId: activeChain?.id,
+        signer,
+        signature,
+        quantity,
+      })
       // TODO: toast error
       return tx
     },
@@ -48,6 +54,16 @@ export const useClaim = () => {
       log.verbose('ON_SETTLED', { data, error, variables, context })
     },
     onSuccess: (data, variables, context) => {
+      if (!data) {
+        log.error({ data, variables, context })
+        toast({
+          id: useClaim.name,
+          status: 'error',
+          title: 'Error',
+          description: data || 'unexpected error occurred',
+        })
+        return
+      }
       log.success({ data, variables, context })
       toast({
         id: useClaim.name,

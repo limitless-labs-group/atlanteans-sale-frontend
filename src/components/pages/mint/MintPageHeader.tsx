@@ -1,7 +1,12 @@
 import { Characters, Timer } from '@/components'
+import { SalePhase, SALE_PHASE_HEADER_SUBTITLE, SALE_PHASE_HEADER_TITLE } from '@/constants'
 import { Flex, Heading, VStack, Text } from '@chakra-ui/react'
 
-export const MintPageHeader = () => (
+interface IMintPageHeader {
+  salePhase: SalePhase
+}
+
+export const MintPageHeader = ({ salePhase }: IMintPageHeader) => (
   <Flex
     bg='atlanteans.aquaDark'
     direction={{ base: 'column', md: 'row' }}
@@ -14,21 +19,21 @@ export const MintPageHeader = () => (
     pos='relative'
   >
     <VStack
-      spacing='40px'
+      spacing='25px'
       w={{ base: 'full', md: '420px', lg: '480px', xl: '515px' }}
       zIndex={1}
       alignItems='start'
       backdropFilter='blur(1px)'
     >
       <VStack spacing='16px' alignItems='start'>
-        <Heading fontSize={{ base: '32px', xl: '36px' }}>Dutch Auction</Heading>
+        <Heading fontSize={{ base: '32px', xl: '36px' }} lineHeight='50px'>
+          {SALE_PHASE_HEADER_TITLE[salePhase]}
+        </Heading>
         <Text fontSize={{ base: '16px', md: '15px', xl: '16px' }}>
-          True last-price dutch auction, meaning that if a user mints at 0.1420, but the collection
-          sells out at a price point of 0.069ETH,or any other arbitrary price interval, all users
-          will get the same price & be refunded any additional ETH.
+          {SALE_PHASE_HEADER_SUBTITLE[salePhase]}
         </Text>
       </VStack>
-      <Timer />
+      <Timer subtitle='Starting in:' />
     </VStack>
     <Characters />
   </Flex>

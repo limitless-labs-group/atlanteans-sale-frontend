@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation } from 'wagmi'
 import { useFetchProof, useLogger, useNetwork, useToast } from '@/hooks'
 import { AtlanteansSaleUtil } from '@/contracts'
 import { useSigner } from 'wagmi'

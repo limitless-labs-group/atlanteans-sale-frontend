@@ -1,9 +1,38 @@
-import { Button, SocialButtons, Timer } from '@/components'
-import { ICONS_BASE_DIR, IMAGES_BASE_DIR, TEXTURES_BASE_DIR } from '@/constants'
+import { Button, ConnectButton, SocialButtons, Timer } from '@/components'
+import {
+  ICONS_BASE_DIR,
+  IMAGES_BASE_DIR,
+  SalePhase,
+  SALE_PHASE_NFT_INFO_SUBTITLE,
+  SALE_PHASE_NFT_INFO_TITLE,
+  TEXTURES_BASE_DIR,
+} from '@/constants'
+import { useNetwork } from '@/hooks'
 import { pressStart2p } from '@/styles'
 import { Flex, Heading, HStack, Image, VStack, Text, Input, Stack } from '@chakra-ui/react'
+import { useAccount } from 'wagmi'
 
-export const MintPageNft = () => {
+interface IMintPageHeader {
+  salePhase: SalePhase
+  price?: string | number
+  remainingSupply?: string | number
+  quantity?: string | number
+  onQuantityChange?: (quantity: string | number) => void
+  onMintButtonClick?: () => void
+}
+
+export const MintPageNft = ({
+  salePhase,
+  price = '0.069',
+  remainingSupply = 0,
+  quantity,
+  onQuantityChange,
+  onMintButtonClick,
+}: IMintPageHeader) => {
+  const { isConnected } = useAccount()
+  const { isActiveChainSupported } = useNetwork()
+  const showConnectButton = !isConnected || !isActiveChainSupported
+
   const NftImage = () => (
     <Flex
       maxW='630px'
@@ -18,50 +47,56 @@ export const MintPageNft = () => {
     </Flex>
   )
   const NftInfo = () => (
-    <VStack w='full' whiteSpace='break-spaces' spacing='30px' alignItems='start'>
+    <VStack
+      w='full'
+      whiteSpace='break-spaces'
+      spacing={{ base: '16px', md: '30px' }}
+      alignItems='start'
+    >
       <VStack spacing={{ base: '16px', md: '30px' }} w='full' alignItems='start'>
-        <Heading fontSize={{ base: '32px', xl: '36px' }} textTransform='uppercase'>
-          Atlantean NFT
-        </Heading>
-        <Text>
-          Founding Atlanteans, some partner communities & selected Pre-mint winners are able to mint
-          up to 2 NFTs per wallet, at a price of 0.05ETH.
-        </Text>
-      </VStack>
-      <HStack spacing='12px'>
-        <Flex
-          bg='atlanteans.yellow'
-          color='black'
-          p='6px 12px 6px 10px'
-          gap='4px'
-          alignItems='center'
+        <Heading
+          fontSize={{ base: '32px', xl: '36px' }}
+          lineHeight='50px'
+          textTransform='uppercase'
         >
-          <Image src={`${ICONS_BASE_DIR}/eth.svg`} alt='Ethereum' h={25} />
-          <Text fontSize='24px' fontWeight='bold'>
-            0.069
-          </Text>
-        </Flex>
-        <Text>1999 NFTs available</Text>
-      </HStack>
+          {SALE_PHASE_NFT_INFO_TITLE[salePhase]}
+        </Heading>
+        <Text>{SALE_PHASE_NFT_INFO_SUBTITLE[salePhase]}</Text>
+      </VStack>
+      {salePhase !== SalePhase.CLAIM && (
+        <HStack spacing='12px'>
+          <Flex
+            bg='atlanteans.yellow'
+            color='black'
+            p='6px 12px 6px 10px'
+            gap='4px'
+            alignItems='center'
+          >
+            <Image src={`${ICONS_BASE_DIR}/eth.svg`} alt='Ethereum' h={25} />
+            <Text fontSize='24px' fontWeight='bold'>
+              {price}
+            </Text>
+          </Flex>
+          <Text>{remainingSupply} NFTs available</Text>
+        </HStack>
+      )}
     </VStack>
   )
   const QuantityInput = () => (
-    <HStack h='56px' w='full'>
+    <HStack h='56px' w={{ base: 'full', md: '300px', lg: '375px' }}>
       <Button
         variant='squar'
         color='white'
         fontSize='2xl'
         fontFamily={pressStart2p.style.fontFamily}
-        // onClick={() => setQuantity(quantity - 1)}
+        onClick={() => onQuantityChange?.(Number(quantity) - 1)}
       >
         -
       </Button>
       <Input
         type='number'
-        min={1}
-        max={19}
         h='full'
-        w={{ base: 'full', md: '200px' }}
+        w='full'
         border='none'
         borderRadius='none'
         bg='whiteAlpha.100'
@@ -70,34 +105,29 @@ export const MintPageNft = () => {
         textAlign='center'
         _focus={{ boxShadow: 'none' }}
         defaultValue={1}
-        // onChange={(e) => setQuantity(Number(e.target.value))}
+        value={quantity}
+        onChange={(e) => onQuantityChange?.(e.target.value)}
       />
       <Button
         variant='squar'
         color='white'
         fontSize='2xl'
         fontFamily={pressStart2p.style.fontFamily}
-        // onClick={() => setQuantity(quantity + 1)}
+        onClick={() => onQuantityChange?.(Number(quantity) + 1)}
       >
         +
       </Button>
     </HStack>
   )
-  const PhaseTimer = () => (
-    <VStack spacing='20px' alignItems='start'>
-      <Heading fontSize='24px' textTransform='uppercase'>
-        Auction Ending in:
-      </Heading>
-      <Timer size='sm' />
-    </VStack>
-  )
   const MintButtons = () => (
-    <Stack w='full' direction={{ base: 'column', md: 'row' }}>
-      <Button colorScheme='yellow' size='lg' w='full'>
-        Connect Wallet
-      </Button>
-      <Button size='lg' w='full' isDisabled>
-        Mint
+    <Stack w={{ base: 'full', md: '300px', lg: '375px' }} direction={{ base: 'column' }}>
+      {showConnectButton && (
+        <ConnectButton colorScheme='yellow' size='lg' w='full'>
+          Connect Wallet
+        </ConnectButton>
+      )}
+      <Button size='lg' w='full' isDisabled={!isConnected} onClick={onMintButtonClick}>
+        {salePhase === SalePhase.CLAIM ? 'Claim' : 'Mint'}
       </Button>
     </Stack>
   )
@@ -120,10 +150,10 @@ export const MintPageNft = () => {
         alignItems={{ base: 'center', md: 'start' }}
       >
         <NftImage />
-        <VStack w='full' spacing='40px' alignItems='start' py='10px'>
+        <VStack w='full' spacing={{ base: '30px', md: '40px' }} alignItems='start' py='10px'>
           <NftInfo />
           <QuantityInput />
-          <PhaseTimer />
+          {/* <Timer size='sm' title='STARTING IN:' display={{ base: 'none', md: 'flex' }} /> */}
           <MintButtons />
           <Share />
         </VStack>

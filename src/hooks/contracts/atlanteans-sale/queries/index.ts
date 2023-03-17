@@ -1,4 +1,4 @@
-export * from './useClaimStarted'
+export * from './useClaimState'
 export * from './useCurrentDAPrice'
 export * from './useDAStarted'
 export * from './useWLStarted'

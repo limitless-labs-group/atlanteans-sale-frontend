@@ -1,7 +1,7 @@
 import { AtlanteansAPI } from '@/apis'
 import { SalePhase } from '@/constants'
 import { useLogger } from '@/hooks'
-import { useMutation } from 'react-query'
+import { useMutation } from 'wagmi'
 import { useSigner } from 'wagmi'
 
 interface IFetchProof {

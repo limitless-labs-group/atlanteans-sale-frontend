@@ -1,12 +1,11 @@
 import { useLogger, useAtlanteansSaleContract } from '@/hooks'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from 'wagmi'
 
 export const useCurrentDAPrice = () => {
   const log = useLogger(useCurrentDAPrice.name)
   const atlanteansSale = useAtlanteansSaleContract()
 
-  const query = useQuery({
-    queryKey: ['current-da-price-query'],
+  const query = useQuery(['current-da-price-query'], {
     queryFn: () => atlanteansSale.currentDaPrice(),
     onError: (error) => {
       log.error({ error })

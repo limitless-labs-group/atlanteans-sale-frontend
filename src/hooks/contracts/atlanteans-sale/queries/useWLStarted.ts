@@ -1,12 +1,11 @@
 import { useLogger, useAtlanteansSaleContract } from '@/hooks'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from 'wagmi'
 
 export const useWLStarted = () => {
   const log = useLogger(useWLStarted.name)
   const atlanteansSale = useAtlanteansSaleContract()
 
-  const query = useQuery({
-    queryKey: ['wl-started-query'],
+  const query = useQuery(['wl-started-query'], {
     queryFn: () => atlanteansSale.mintlistStarted(),
     onError: (error) => {
       log.error({ error })

@@ -1,8 +1,7 @@
 import { AtlanteansAPI } from '@/apis'
 import { SalePhase } from '@/constants'
 import { useLogger } from '@/hooks'
-import { useMutation } from 'react-query'
-import { useSigner } from 'wagmi'
+import { useMutation, useSigner } from 'wagmi'
 
 interface IFetchSignature {
   salePhase: SalePhase
@@ -20,6 +19,7 @@ export const useFetchSignature = () => {
       }
       const message = await AtlanteansAPI.fetchMessageToSign(salePhase)
       const messageSigned = await signer.signMessage(message) // waiting for user to sign msg in wallet
+      log.verbose(messageSigned)
       const signature = await AtlanteansAPI.fetchSignature(salePhase, message, messageSigned)
       return signature
     },

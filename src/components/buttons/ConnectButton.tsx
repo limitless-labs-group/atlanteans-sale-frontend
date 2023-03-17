@@ -1,15 +1,17 @@
-import { Button } from '@/components'
+import { Button, IButton } from '@/components'
 import { Flex, FlexProps } from '@chakra-ui/react'
 import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit'
 
-export const ConnectButton = ({ ...props }: FlexProps) => (
+type IConnectButton = IButton & FlexProps
+
+export const ConnectButton = ({ colorScheme, ...props }: IConnectButton) => (
   <Flex {...props}>
     <RainbowConnectButton.Custom>
       {({ account, chain, openAccountModal, openChainModal, openConnectModal, mounted }) => {
         const ready = mounted
         const connected = ready && account && chain
         return (
-          <div
+          <Flex
             {...(!ready && {
               'aria-hidden': true,
               style: {
@@ -18,25 +20,30 @@ export const ConnectButton = ({ ...props }: FlexProps) => (
                 userSelect: 'none',
               },
             })}
+            {...props}
           >
             {(() => {
               if (!connected) {
-                return <Button onClick={openConnectModal}>Connect Wallet</Button>
+                return (
+                  <Button onClick={openConnectModal} colorScheme={colorScheme} {...props}>
+                    Connect Wallet
+                  </Button>
+                )
               }
               if (chain.unsupported) {
                 return (
-                  <Button onClick={openChainModal} colorScheme='yellow'>
+                  <Button onClick={openChainModal} colorScheme='yellow' {...props}>
                     Wrong network
                   </Button>
                 )
               }
               return (
-                <Button onClick={openAccountModal} width='auto'>
+                <Button onClick={openAccountModal} width='auto' {...props}>
                   {account.displayName}
                 </Button>
               )
             })()}
-          </div>
+          </Flex>
         )
       }}
     </RainbowConnectButton.Custom>

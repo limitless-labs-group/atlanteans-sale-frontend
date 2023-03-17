@@ -1,18 +1,26 @@
 import { TEXTURES_BASE_DIR } from '@/constants'
-import { Flex, Heading, HStack, Text, VStack } from '@chakra-ui/react'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { Flex, StackProps, Heading, HStack, Text, VStack } from '@chakra-ui/react'
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 
 const SECOND = 1000
 const MINUTE = SECOND * 60
 const HOUR = MINUTE * 60
 const DAY = HOUR * 24
 
-interface ITimer {
+interface ITimer extends StackProps {
   timestamp?: number
   size?: 'sm' | 'lg'
+  title?: string
+  subtitle?: string
 }
 
-export const Timer = ({ timestamp = 1679475581, size = 'lg' }: ITimer) => {
+export const Timer = ({
+  timestamp = 1679475581,
+  size = 'lg',
+  title,
+  subtitle,
+  ...props
+}: ITimer) => {
   //   const parsedDeadline = useMemo(() => Date.parse(timestamp), [timestamp])
   const [time, setTime] = useState(0)
 
@@ -20,6 +28,17 @@ export const Timer = ({ timestamp = 1679475581, size = 'lg' }: ITimer) => {
     const interval = setInterval(() => setTime(timestamp * 1000 - Date.now()), 1000)
     return () => clearInterval(interval)
   }, [])
+
+  const timesMapping = useMemo(() => {
+    const showDays = time / DAY > 0
+    const showSec = !showDays
+    return Object.entries({
+      ...(showDays ? { Days: time / DAY } : {}),
+      Hrs: (time / HOUR) % 24,
+      Min: (time / MINUTE) % 60,
+      ...(showSec ? { Sec: (time / SECOND) % 60 } : {}),
+    })
+  }, [time])
 
   const isSmall = size === 'sm'
 
@@ -64,49 +83,56 @@ export const Timer = ({ timestamp = 1679475581, size = 'lg' }: ITimer) => {
   )
 
   return (
-    <HStack
-      spacing={{ base: 4, md: isSmall ? '28px' : '28px', lg: isSmall ? '28px' : '36px' }}
-      w={{ base: 'full', md: 'auto' }}
-    >
-      {Object.entries({
-        // Days: time / DAY,
-        Hrs: (time / HOUR) % 24,
-        Min: (time / MINUTE) % 60,
-        Sec: (time / SECOND) % 60,
-      }).map(([label, value]) => {
-        const firstDigit = Math.floor(value / 10)
-        const secondDigit = Math.floor(value % 10)
-        return (
-          <VStack
-            key={label}
-            spacing={{ base: '10px', md: isSmall ? '10px' : '10px', lg: isSmall ? '10px' : '16px' }}
-          >
-            <HStack spacing={{ base: '2px', md: '4px' }} pos='relative'>
-              <TimerBlock>{firstDigit}</TimerBlock>
-              <TimerBlock>{secondDigit}</TimerBlock>
-              {label !== 'Sec' && (
-                <Text
-                  fontSize={{
-                    base: '3xl',
-                    md: isSmall ? '3xl' : '3xl',
-                    lg: isSmall ? '3xl' : '4xl',
-                  }}
-                  pos='absolute'
-                  right={{
-                    base: '-13px',
-                    md: isSmall ? '-20px' : '-20px',
-                    lg: isSmall ? '-20px' : '-24px',
-                  }}
-                  zIndex='1'
-                >
-                  :
-                </Text>
-              )}
-            </HStack>
-            <Text fontWeight='bold'>{label}</Text>
-          </VStack>
-        )
-      })}
-    </HStack>
+    <VStack spacing='20px' alignItems='start' {...props}>
+      {title && (
+        <Heading fontSize='24px' textTransform='uppercase'>
+          {title}
+        </Heading>
+      )}
+      {subtitle && <Text>{subtitle}</Text>}
+      <HStack
+        spacing={{ base: 4, md: isSmall ? '28px' : '28px', lg: isSmall ? '28px' : '36px' }}
+        w={{ base: 'full', md: 'auto' }}
+      >
+        {timesMapping.map(([label, value], index) => {
+          const firstDigit = Math.floor(value / 10)
+          const secondDigit = Math.floor(value % 10)
+          return (
+            <VStack
+              key={index}
+              spacing={{
+                base: '10px',
+                md: isSmall ? '10px' : '10px',
+                lg: isSmall ? '10px' : '16px',
+              }}
+            >
+              <HStack spacing={{ base: '2px', md: '4px' }} pos='relative'>
+                <TimerBlock>{firstDigit}</TimerBlock>
+                <TimerBlock>{secondDigit}</TimerBlock>
+                {index !== timesMapping.length - 1 && (
+                  <Text
+                    fontSize={{
+                      base: '3xl',
+                      md: isSmall ? '3xl' : '3xl',
+                      lg: isSmall ? '3xl' : '4xl',
+                    }}
+                    pos='absolute'
+                    right={{
+                      base: '-13px',
+                      md: isSmall ? '-20px' : '-20px',
+                      lg: isSmall ? '-20px' : '-24px',
+                    }}
+                    zIndex='1'
+                  >
+                    :
+                  </Text>
+                )}
+              </HStack>
+              <Text fontWeight='bold'>{label}</Text>
+            </VStack>
+          )
+        })}
+      </HStack>
+    </VStack>
   )
 }

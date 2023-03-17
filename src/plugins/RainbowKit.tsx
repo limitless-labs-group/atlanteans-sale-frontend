@@ -39,7 +39,7 @@ export const connectors = connectorsForWallets([
 ])
 
 export const RainbowKitProvider = ({ children }: PropsWithChildren) => (
-  <RainbowKitDefaultProvider chains={chains} theme={rainbowKitTheme}>
+  <RainbowKitDefaultProvider chains={chains} theme={rainbowKitTheme} coolMode>
     {children}
   </RainbowKitDefaultProvider>
 )

@@ -1,6 +1,5 @@
 import { Button, Head, Header } from '@/components'
 import { IMAGES_BASE_DIR, TEXTURES_BASE_DIR } from '@/constants'
-import { useLocalStorage } from '@/hooks'
 import { Flex, Heading, HStack, Image, Slide, Stack, Text, useMediaQuery } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
@@ -31,8 +30,8 @@ const StoryPage = () => {
   const [step, setStep] = useState(0)
   const currentSlide = slides[step]
   const isLastSlide = step === slides.length - 1
-  const [slideshowMode, setSlideshowMode] = useState(false)
 
+  const [slideshowMode, setSlideshowMode] = useState(false)
   useEffect(() => {
     if (slideshowMode) {
       setTimeout(() => setSlideshowMode(false), 15000)
@@ -43,7 +42,9 @@ const StoryPage = () => {
    * handlers
    */
   const handleIllustrationClick = useCallback(() => {
-    setSlideshowMode(!slideshowMode)
+    if (isMobile) {
+      setSlideshowMode(!slideshowMode)
+    }
   }, [slideshowMode])
 
   const handleNextButtonClick = useCallback(() => {
@@ -88,12 +89,16 @@ const StoryPage = () => {
   const Illustration = () => {
     const IllustrationImage = () => (
       <Image
+        bg='atlanteans.yellow'
         src={currentSlide.imageSrc}
         alt={currentSlide.heading}
         transform={{
           base: slideshowMode ? `scale(2) translateX(-25%)` : 'none',
           md: 'none',
         }}
+        w='full'
+        h='calc(100vw / 2.05)'
+        maxH='calc(1440px / 2.05)'
       />
     )
     return (
@@ -112,21 +117,19 @@ const StoryPage = () => {
         top={0}
         left={0}
         zIndex={1}
-        cursor='pointer'
+        cursor={{ base: 'pointer', md: 'default' }}
         onClick={handleIllustrationClick}
       >
-        <IllustrationImage />
-        {isMobile && (
-          <Slide
-            direction='right'
-            in={slideshowMode}
-            style={{ zIndex: 10, transitionDuration: '20s' }}
-          >
-            <Flex alignItems='center' w='full' h='full'>
-              <IllustrationImage />
-            </Flex>
-          </Slide>
-        )}
+        {!slideshowMode && <IllustrationImage />}
+        <Slide
+          direction='right'
+          in={slideshowMode}
+          style={{ zIndex: 10, transitionDuration: '20s' }}
+        >
+          <Flex alignItems='center' w='full' h='full'>
+            <IllustrationImage />
+          </Flex>
+        </Slide>
       </Flex>
     )
   }

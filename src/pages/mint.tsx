@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { MintLayout } from '@/components'
 import { MintPageHeader, MintPageNft } from '@/components/pages'
+import { SalePhase } from '@/constants'
 
 const MintPage = () => {
   // const [quantity, setQuantity] = useState(1)
@@ -13,8 +14,8 @@ const MintPage = () => {
 
   return (
     <MintLayout>
-      <MintPageHeader />
-      <MintPageNft />
+      <MintPageHeader salePhase={SalePhase.DA} />
+      <MintPageNft salePhase={SalePhase.DA} />
     </MintLayout>
   )
 }

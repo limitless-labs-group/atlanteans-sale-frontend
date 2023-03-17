@@ -10,6 +10,7 @@ import {
 import { AtlanteansSale__factory, AtlanteansSale } from '@/contracts/types'
 import { Signer, SignerOrProvider, ContractTransaction, MerkleProof } from '@/types'
 import { getChain, getProvider } from '@/utils'
+import { constants } from 'ethers'
 
 interface IAtlanteansSaleUtilGetContract {
   signerOrProvider?: SignerOrProvider
@@ -30,6 +31,8 @@ export enum MintError {
 }
 
 interface IAtlanteansSaleUtilMint {
+  address?: string
+  chainId?: number
   signer: Signer
   quantity: number
 }
@@ -208,11 +211,13 @@ export class AtlanteansSaleUtil {
   }
 
   static claim = async ({
+    address,
+    chainId,
     signer,
     quantity,
     signature,
   }: IAtlanteansSaleUtilMintWithSignature): IAtlanteansSaleUtilMintResponse => {
-    const [address, chainId] = await Promise.all([signer.getAddress(), signer.getChainId()])
+    // const [address, chainId] = await Promise.all([signer.getAddress(), signer.getChainId()])
     const contract = this.getContract({
       signerOrProvider: signer,
       chainId,
@@ -221,7 +226,7 @@ export class AtlanteansSaleUtil {
     const [hasClaimStarted, hasClaimEnded, quantityRemaining] = await Promise.all([
       contract.claimsStarted(),
       contract.claimsEnded(),
-      contract.faToRemainingClaim(address),
+      contract.faToRemainingClaim(address ?? constants.AddressZero),
     ])
 
     if (hasClaimEnded) {
