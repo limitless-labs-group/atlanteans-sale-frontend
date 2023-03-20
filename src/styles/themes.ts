@@ -16,6 +16,7 @@ const atlanteansColors = {
   gray: '#0E121E',
   text: '#0E121E',
   gradient: 'linear-gradient(0deg, #59DDBC, #173A49)',
+  green: '#36B183',
 }
 
 export const chakraTheme = ChakraTheme({
