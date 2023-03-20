@@ -196,7 +196,7 @@ export class AtlanteansSaleUtil {
       chainId,
     })
 
-    const tokenPrice = await contract.finalPrice()
+    const tokenPrice = await contract.lastPrice()
     const totalPrice = tokenPrice.mul(quantity)
 
     const nonce = await signer.getTransactionCount()
@@ -252,7 +252,7 @@ export class AtlanteansSaleUtil {
 
     const nonce = await signer.getTransactionCount()
 
-    const tx = await contract.claimSummon(signature, quantity, {
+    const tx = await contract.claimSummon(signature, quantity, quantity, {
       gasLimit: MINT_GAS_LIMIT,
       nonce,
     })

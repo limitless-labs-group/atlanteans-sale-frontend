@@ -1,6 +1,6 @@
 import { useToast, useLogger, useNetwork, useFetchSignature } from '@/hooks'
 import { AtlanteansSaleUtil } from '@/contracts'
-import { useAccount, useMutation, useSigner } from 'wagmi'
+import { useAccount, useMutation, useQueryClient, useSigner } from 'wagmi'
 import { SalePhase } from '@/constants'
 
 /**
@@ -9,6 +9,8 @@ import { SalePhase } from '@/constants'
 export const useClaim = () => {
   const log = useLogger(useClaim.name)
   const toast = useToast()
+
+  const queryCient = useQueryClient()
 
   const { isActiveChainSupported, activeChain } = useNetwork()
   const { address } = useAccount()
@@ -64,6 +66,10 @@ export const useClaim = () => {
         })
         return
       }
+
+      // * refetching claim state
+      queryCient.invalidateQueries(['claim-state-query', address])
+
       log.success({ data, variables, context })
       toast({
         id: useClaim.name,

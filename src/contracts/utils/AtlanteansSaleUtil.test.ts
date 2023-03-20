@@ -13,7 +13,10 @@ describe('AtlanteansSaleUtil', () => {
   const provider = getProvider({ chain: TESTNET_CHAIN })
   const signer = new Wallet(process.env.TEST_WALLET_PRIVATE_KEY ?? '', provider)
   const MaxSchnaider = '0xb1D7daD6baEF98df97bD2d3Fb7540c08886e0299'
-  let contract: AtlanteansSale
+  const contract: AtlanteansSale = AtlanteansSaleUtil.getContract({
+    chainId: TESTNET_CHAIN.id,
+    signerOrProvider: signer,
+  })
   // proof for WL
   const proof = [
     '0x7928da0aaeaf0f411e6b271d26aefd8c05e36545bdf24e51436ed472910a7286',
@@ -26,15 +29,37 @@ describe('AtlanteansSaleUtil', () => {
   const itif = (condition: boolean) => (condition ? it : it.skip)
 
   it('should return correct AtlanteansSale contract instance', async () => {
-    contract = AtlanteansSaleUtil.getContract({
-      chainId: TESTNET_CHAIN.id,
-      signerOrProvider: provider,
-    })
     expect(contract.address).toBe(ATLANTEANS_SALE_CONTRACT_ADDRESS[TESTNET_CHAIN.id])
-    const finalPrice = await contract.finalPrice()
+    const finalPrice = await contract.lastPrice()
     // console.log(utils.formatEther(finalPrice))
     expect(finalPrice.gt(0)).toBeTruthy()
   })
+
+  it('should set timestamps', async () => {
+    const SECOND = 1000
+    const MINUTE = 60
+    const DAY = 24 * 60 * MINUTE
+    const now = Date.now() / SECOND
+    const wlStartTime = now.toFixed(0)
+    const daStartTime = (now + 0.1 * MINUTE).toFixed(0)
+    const claimStartTime = (now + 1 * MINUTE).toFixed(0)
+    const claimEndTime = (now + 1 * DAY).toFixed(0)
+
+    console.log(wlStartTime)
+    console.log(daStartTime)
+    console.log(claimStartTime)
+    console.log(claimEndTime)
+
+    const tx = await contract.setPhaseTimes(
+      daStartTime,
+      wlStartTime,
+      claimStartTime,
+      claimEndTime,
+      { gasLimit: 200_000 }
+    )
+    await tx.wait()
+    console.log(tx.hash)
+  }, 30000)
 
   // describe('whitelist', () => {
   //   let hasWLStarted = false,
@@ -103,7 +128,7 @@ describe('AtlanteansSaleUtil', () => {
         expect(receipt?.status).toBe(1)
         const quantityRemaining = await contract.faToRemainingClaim(MaxSchnaider)
         hasClaimed = quantityRemaining.lt(maxQuantityToClaim)
-        expect(hasClaimed).toBeTruthy
+        expect(hasClaimed).toBeTruthy()
       },
       30000
     )
