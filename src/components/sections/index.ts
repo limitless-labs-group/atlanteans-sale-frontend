@@ -1,2 +1,6 @@
 export * from './Header'
 export * from './Footer'
+export * from './SaleHeader'
+export * from './MintSection'
+export * from './OverviewSection'
+export * from './PerksSection'

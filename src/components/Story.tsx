@@ -1,7 +1,6 @@
 import { Button, Head, Header } from '@/components'
 import { IMAGES_BASE_DIR, TEXTURES_BASE_DIR } from '@/constants'
 import { Flex, Heading, HStack, Image, Slide, Stack, Text, useMediaQuery } from '@chakra-ui/react'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 
 type Slide = { heading: string; text: string; imageSrc: string }
@@ -23,10 +22,13 @@ const slides: Slide[] = [
   },
 ]
 
-const StoryPage = () => {
+interface IStory {
+  onStoryComplete?: () => void
+}
+
+export const Story = ({ onStoryComplete }: IStory) => {
   const [isMobile] = useMediaQuery('(max-width: 767px)')
 
-  // const [step, setStep] = useLocalStorage('storyStep', 0)
   const [step, setStep] = useState(0)
   const currentSlide = slides[step]
   const isLastSlide = step === slides.length - 1
@@ -45,11 +47,11 @@ const StoryPage = () => {
     if (isMobile) {
       setSlideshowMode(!slideshowMode)
     }
-  }, [slideshowMode])
+  }, [slideshowMode, isMobile])
 
   const handleNextButtonClick = useCallback(() => {
     if (isLastSlide) {
-      goToMint()
+      onStoryComplete?.()
       return
     }
     setStep(step + 1)
@@ -59,15 +61,9 @@ const StoryPage = () => {
     setStep(step - 1)
   }, [step])
 
-  /**
-   * routing
-   */
-  const router = useRouter()
-  const goToMint = () => router.push('/mint')
-
   const Skip = () => (
     <Flex w='full' justifyContent='end'>
-      <HStack spacing='20px' cursor='pointer' onClick={goToMint}>
+      <HStack spacing='20px' cursor='pointer' onClick={onStoryComplete}>
         <Text fontWeight='bold' fontSize={{ base: '18px', lg: '20px' }}>
           Skip
         </Text>
@@ -199,5 +195,3 @@ const StoryPage = () => {
     </Stack>
   )
 }
-
-export default StoryPage

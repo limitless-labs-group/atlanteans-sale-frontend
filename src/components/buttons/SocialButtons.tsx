@@ -3,10 +3,22 @@ import { HStack, Image, Link, StackProps } from '@chakra-ui/react'
 
 type Social = { name: string; href: string; imageSrc: string }
 const socials: Social[] = [
-  { name: 'Discord', href: '', imageSrc: `${ICONS_BASE_DIR}/discord.svg` },
-  { name: 'Opensea', href: '', imageSrc: `${ICONS_BASE_DIR}/opensea.svg` },
-  { name: 'Twitter', href: '', imageSrc: `${ICONS_BASE_DIR}/twitter.svg` },
-  { name: 'Telegram', href: '', imageSrc: `${ICONS_BASE_DIR}/telegram.svg` },
+  {
+    name: 'Discord',
+    href: 'https://discord.gg/atlantisworld',
+    imageSrc: `${ICONS_BASE_DIR}/discord.svg`,
+  },
+  {
+    name: 'Opensea',
+    href: 'https://opensea.io/collection/atlanteans',
+    imageSrc: `${ICONS_BASE_DIR}/opensea.svg`,
+  },
+  {
+    name: 'Twitter',
+    href: 'https://twitter.com/atlantis0x',
+    imageSrc: `${ICONS_BASE_DIR}/twitter.svg`,
+  },
+  // { name: 'Telegram', href: '', imageSrc: `${ICONS_BASE_DIR}/telegram.svg` },
 ]
 
 interface ISocialButtons extends Omit<StackProps, 'children'> {
@@ -40,7 +52,14 @@ export const SocialButtons = ({
             ? { h: '40px', w: '40px', border: '1px solid', borderColor }
             : { h: 'full' })}
         >
-          <Image src={social.imageSrc} alt={social.name} minW={iconSize} minH={iconSize} />
+          <Image
+            src={social.imageSrc}
+            alt={social.name}
+            w={iconSize}
+            h={iconSize}
+            minW={iconSize}
+            minH={iconSize}
+          />
         </Link>
       ))}
     </HStack>

@@ -15,22 +15,25 @@ interface ITimer extends StackProps {
 }
 
 export const Timer = ({
-  timestamp = 1679475581,
+  timestamp = 1679475581000,
   size = 'lg',
   title,
   subtitle,
   ...props
 }: ITimer) => {
-  //   const parsedDeadline = useMemo(() => Date.parse(timestamp), [timestamp])
   const [time, setTime] = useState(0)
 
   useEffect(() => {
-    const interval = setInterval(() => setTime(timestamp * 1000 - Date.now()), 1000)
+    if (timestamp <= Date.now()) {
+      setTime(0)
+      return
+    }
+    const interval = setInterval(() => setTime(timestamp - Date.now()), 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [timestamp])
 
   const timesMapping = useMemo(() => {
-    const showDays = time / DAY > 0
+    const showDays = time / DAY > 1
     const showSec = !showDays
     return Object.entries({
       ...(showDays ? { Days: time / DAY } : {}),
@@ -95,6 +98,9 @@ export const Timer = ({
         w={{ base: 'full', md: 'auto' }}
       >
         {timesMapping.map(([label, value], index) => {
+          if (value < 0) {
+            value = 0
+          }
           const firstDigit = Math.floor(value / 10)
           const secondDigit = Math.floor(value % 10)
           return (

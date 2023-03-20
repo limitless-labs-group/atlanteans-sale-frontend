@@ -1,1 +1,1 @@
-export { default } from './story'
+export { default } from './mint'

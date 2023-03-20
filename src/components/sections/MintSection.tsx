@@ -9,41 +9,81 @@ import {
 } from '@/constants'
 import { useNetwork } from '@/hooks'
 import { pressStart2p } from '@/styles'
-import { Flex, Heading, HStack, Image, VStack, Text, Input, Stack } from '@chakra-ui/react'
+import {
+  Flex,
+  Heading,
+  HStack,
+  Image,
+  VStack,
+  Text,
+  Input,
+  Stack,
+  useNumberInput,
+} from '@chakra-ui/react'
+import { useEffect } from 'react'
 import { useAccount } from 'wagmi'
 
-interface IMintPageHeader {
+interface IMintSection {
   salePhase: SalePhase
   price?: string | number
   remainingSupply?: string | number
-  quantity?: string | number
-  onQuantityChange?: (quantity: string | number) => void
+  maxQuantity?: number
+  onQuantityChange?: (newQuantity: number) => void
   onMintButtonClick?: () => void
 }
 
-export const MintPageNft = ({
+export const MintSection = ({
   salePhase,
   price = '0.069',
   remainingSupply = 0,
-  quantity,
+  maxQuantity,
   onQuantityChange,
   onMintButtonClick,
-}: IMintPageHeader) => {
+}: IMintSection) => {
   const { isConnected } = useAccount()
   const { isActiveChainSupported } = useNetwork()
   const showConnectButton = !isConnected || !isActiveChainSupported
 
+  const min = Number(maxQuantity) < 1 ? maxQuantity : 1
+
+  const {
+    getInputProps,
+    getIncrementButtonProps,
+    getDecrementButtonProps,
+    value: quantity,
+  } = useNumberInput({
+    step: 1,
+    defaultValue: min,
+    min: min,
+    max: maxQuantity ?? 19,
+    precision: 0,
+  })
+  const inc = getIncrementButtonProps()
+  const dec = getDecrementButtonProps()
+  const input = getInputProps()
+
+  useEffect(() => {
+    onQuantityChange?.(Number(quantity))
+  }, [quantity])
+
   const NftImage = () => (
     <Flex
-      maxW='630px'
-      maxH='630px'
-      flex='0 100%'
-      flexWrap='wrap'
-      // maxW='90%'
+      maxH={{ base: 'full', md: '606px' }}
+      maxW={{ base: 'full', md: '606px' }}
+      w='full'
+      overflow='hidden'
       border='12px solid transparent'
+      pos='relative'
       style={{ borderImage: `url("${TEXTURES_BASE_DIR}/pixel-border-image.png") 12 stretch` }}
     >
-      <Image src={`${IMAGES_BASE_DIR}/nft-placeholder.jpg`} alt='Atlantean Character NFT' />
+      <Image
+        src={`${IMAGES_BASE_DIR}/nft-placeholder.jpg`}
+        alt='Atlantean Character NFT'
+        bg='atlanteans.aqua'
+        w='full'
+        minH={{ base: 'calc(100vw / 1.25)', md: 'calc(100vw / 2.5)', '2xl': 'calc(606px - 24px)' }}
+        objectFit='cover'
+      />
     </Flex>
   )
   const NftInfo = () => (
@@ -85,15 +125,17 @@ export const MintPageNft = ({
   const QuantityInput = () => (
     <HStack h='56px' w={{ base: 'full', md: '300px', lg: '375px' }}>
       <Button
+        {...dec}
         variant='squar'
         color='white'
         fontSize='2xl'
         fontFamily={pressStart2p.style.fontFamily}
-        onClick={() => onQuantityChange?.(Number(quantity) - 1)}
+        // onClick={() => onQuantityChange?.(Number(quantity) - 1)}
       >
         -
       </Button>
       <Input
+        {...input}
         type='number'
         h='full'
         w='full'
@@ -104,16 +146,17 @@ export const MintPageNft = ({
         fontFamily={pressStart2p.style.fontFamily}
         textAlign='center'
         _focus={{ boxShadow: 'none' }}
-        defaultValue={1}
-        value={quantity}
-        onChange={(e) => onQuantityChange?.(e.target.value)}
+        pointerEvents='none'
+        // value={quantity}
+        // onChange={(e) => onQuantityChange?.(e.target.value)}
       />
       <Button
+        {...inc}
         variant='squar'
         color='white'
         fontSize='2xl'
         fontFamily={pressStart2p.style.fontFamily}
-        onClick={() => onQuantityChange?.(Number(quantity) + 1)}
+        // onClick={() => onQuantityChange?.(Number(quantity) + 1)}
       >
         +
       </Button>
@@ -139,25 +182,24 @@ export const MintPageNft = ({
   )
 
   return (
-    <Flex w='full' bg='atlanteans.gradient' justifyContent='center'>
-      <Stack
-        direction={{ base: 'column', md: 'row' }}
-        spacing='30px'
-        w='full'
-        maxW='1440px'
-        px={{ base: '20px', md: '50px', xl: '75px' }}
-        py={{ base: '70px', md: '100px' }}
-        alignItems={{ base: 'center', md: 'start' }}
-      >
-        <NftImage />
-        <VStack w='full' spacing={{ base: '30px', md: '40px' }} alignItems='start' py='10px'>
-          <NftInfo />
-          <QuantityInput />
-          {/* <Timer size='sm' title='STARTING IN:' display={{ base: 'none', md: 'flex' }} /> */}
-          <MintButtons />
-          <Share />
-        </VStack>
-      </Stack>
-    </Flex>
+    <Stack
+      direction={{ base: 'column', md: 'row' }}
+      spacing='30px'
+      w='full'
+      maxW='1440px'
+      px={{ base: '20px', md: '50px', xl: '75px' }}
+      pt={{ base: '70px', md: '100px' }}
+      pb={{ base: '30px', md: '60px' }}
+      alignItems={{ base: 'center', md: 'start' }}
+    >
+      <NftImage />
+      <VStack w='full' spacing={{ base: '30px', md: '40px' }} alignItems='start' py='10px'>
+        <NftInfo />
+        <QuantityInput />
+        {/* <Timer size='sm' title='STARTING IN:' display={{ base: 'none', md: 'flex' }} /> */}
+        <MintButtons />
+        {/* <Share /> */}
+      </VStack>
+    </Stack>
   )
 }

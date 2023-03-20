@@ -1,23 +1,39 @@
 import { Newsletter, SocialButtons } from '@/components'
+import { BLOG_URL, BRAND_ASSETS_URL, HOME_URL, LEGAL_URL, WIKI_URL } from '@/constants'
+import { Tab } from '@/types'
 import { Divider, Stack, Link, VStack, Text } from '@chakra-ui/react'
-
-type Tab = { name: string; href: string }
-const tabs: Tab[] = [
-  { name: 'Blog', href: '/blog' },
-  { name: 'About', href: '/about' },
-  { name: 'Docs', href: '/docs' },
-  { name: 'Brand Assets', href: '/brand-assets' },
-  { name: 'Terms of Use', href: '/tos' },
-  { name: 'Privacy Policy', href: '/pp' },
-]
+import { useRouter } from 'next/router'
 
 export const Footer = () => {
+  const router = useRouter()
+  const isClaimPage = router.pathname.includes('claim')
+
+  const tabs: Tab[] = [
+    { name: 'Home', href: HOME_URL },
+    {
+      name: 'Story',
+      onClick: () => {
+        router.query.showStory = 'true'
+        router.push(router)
+      },
+    },
+    {
+      name: isClaimPage ? 'Mint' : 'Claim',
+      onClick: () => {
+        router.push(isClaimPage ? '/' : '/claim')
+      },
+    },
+    { name: 'Wiki', href: WIKI_URL },
+    { name: 'Blog', href: BLOG_URL },
+    { name: 'Brand Assets', href: BRAND_ASSETS_URL },
+    { name: 'Legal', href: LEGAL_URL },
+  ]
+
   const Tabs = () => (
     <Stack
-      spacing={{ base: 6, md: 8 }}
+      spacing={{ base: 6, md: 0 }}
       direction={{ base: 'column', md: 'row' }}
       h='full'
-      my={10}
       alignItems='center'
     >
       {tabs.map((tab) => (
@@ -28,6 +44,8 @@ export const Footer = () => {
           h='full'
           display='inline-flex'
           alignItems='center'
+          px={{ md: 4 }}
+          onClick={tab.onClick}
         >
           <Text>{tab.name}</Text>
         </Link>
@@ -48,7 +66,7 @@ export const Footer = () => {
       textAlign='center'
     >
       <Newsletter mb='10px' w={{ base: 'full', md: 'unset' }} />
-      <Divider />
+      <Divider opacity={0.69} />
       <Tabs />
       <SocialButtons variant='round' />
       <Copyright />

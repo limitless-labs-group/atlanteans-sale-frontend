@@ -1,5 +1,7 @@
 import { ConnectButton, SocialButtons } from '@/components'
-import { ICONS_BASE_DIR, TEXTURES_BASE_DIR } from '@/constants'
+import { BLOG_URL, HOME_URL, ICONS_BASE_DIR, TEXTURES_BASE_DIR, WIKI_URL } from '@/constants'
+import { useLocalStorage } from '@/hooks'
+import { Tab } from '@/types'
 import {
   Flex,
   HStack,
@@ -15,18 +17,32 @@ import {
   Text,
 } from '@chakra-ui/react'
 import NavigationLink from 'next/link'
+import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-type Tab = { name: string; href: string }
-const tabs: Tab[] = [
-  { name: 'About', href: '/about' },
-  { name: 'Atlanteans', href: '/atlanteans' },
-  { name: 'Blog', href: '/blog' },
-  { name: 'Docs', href: '/docs' },
-  { name: 'Marketplace', href: '/marketplace' },
-]
-
 export const Header = () => {
+  const router = useRouter()
+  const isClaimPage = router.pathname.includes('claim')
+
+  const tabs: Tab[] = [
+    { name: 'Home', href: HOME_URL },
+    {
+      name: 'Story',
+      onClick: () => {
+        router.query.showStory = 'true'
+        router.push(router)
+      },
+    },
+    {
+      name: isClaimPage ? 'Mint' : 'Claim',
+      onClick: () => {
+        router.push(isClaimPage ? '/' : '/claim')
+      },
+    },
+    { name: 'Wiki', href: WIKI_URL },
+    { name: 'Blog', href: BLOG_URL },
+  ]
+
   const Logo = () => (
     <NavigationLink href='/'>
       <Image
@@ -40,6 +56,7 @@ export const Header = () => {
       <Image
         src={`${ICONS_BASE_DIR}/atlantis-world-logo.png`}
         h='45px'
+        w='220px'
         objectFit='contain'
         display={{ base: 'block', lg: 'none', xl: 'block' }}
         loading='lazy'
@@ -49,7 +66,7 @@ export const Header = () => {
   const Tabs = () => (
     <Stack
       direction={{ base: 'column', lg: 'row' }}
-      display={{ base: 'none', lg: 'block' }}
+      display={{ base: 'none', lg: 'flex' }}
       whiteSpace='nowrap'
       h='full'
       spacing={0}
@@ -63,6 +80,7 @@ export const Header = () => {
           display='inline-flex'
           alignItems='center'
           px={{ base: 3, xl: 4 }}
+          onClick={tab.onClick}
         >
           <Text>{tab.name}</Text>
         </Link>
@@ -94,6 +112,7 @@ export const Header = () => {
               borderImage: `url('${TEXTURES_BASE_DIR}/pixel-border-gray.png') 10 stretch`,
             }}
             _active={{ bg: 'transparent' }}
+            _focus={{ bg: 'transparent' }}
           />
           <MenuList
             zIndex={10}
@@ -105,7 +124,7 @@ export const Header = () => {
             }}
           >
             {tabs.map((tab) => (
-              <Link key={tab.name} href={tab.href} isExternal>
+              <Link key={tab.name} href={tab.href} onClick={tab.onClick} isExternal>
                 <MenuListItem>{tab.name}</MenuListItem>
               </Link>
             ))}

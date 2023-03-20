@@ -1,6 +1,5 @@
 import React from 'react'
-import { MintLayout } from '@/components'
-import { MintPageHeader, MintPageNft } from '@/components/pages'
+import { MintLayout, MintSection, SaleHeader } from '@/components'
 import { SalePhase } from '@/constants'
 
 const MintPage = () => {
@@ -14,8 +13,8 @@ const MintPage = () => {
 
   return (
     <MintLayout>
-      <MintPageHeader salePhase={SalePhase.DA} />
-      <MintPageNft salePhase={SalePhase.DA} />
+      <SaleHeader salePhase={SalePhase.DA} />
+      <MintSection salePhase={SalePhase.DA} />
     </MintLayout>
   )
 }
