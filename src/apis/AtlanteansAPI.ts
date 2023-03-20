@@ -8,7 +8,8 @@ interface IFetchMessageToSignResponse {
 }
 
 interface IFetchSignatureResponse {
-  encodedArgs?: string
+  signature?: string
+  message?: string
   error?: string
 }
 
@@ -42,12 +43,18 @@ export class AtlanteansAPI {
     return proof
   }
 
-  static fetchSignature = async (salePhase: SalePhase, message: string, messageSigned: string) => {
+  static fetchSignature = async (
+    salePhase: SalePhase,
+    message: string,
+    messageSigned: string,
+    quantity?: number
+  ) => {
     const {
-      data: { encodedArgs: signature, error },
+      data: { signature, error },
     } = await this.http.post<IFetchSignatureResponse>(`/encoded-args/${salePhase}`, {
       digest: message,
       signature: messageSigned,
+      quantity,
     })
     return signature
   }

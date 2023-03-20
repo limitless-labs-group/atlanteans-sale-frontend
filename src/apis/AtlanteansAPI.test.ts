@@ -6,25 +6,27 @@ import { constants, Wallet } from 'ethers'
 describe('AtlanteansAPI', () => {
   const provider = getProvider({ chain: TESTNET_CHAIN })
   const signer = new Wallet(process.env.TEST_WALLET_PRIVATE_KEY ?? '', provider)
-  let message: string, messageSigned: string
 
   it('should fetch message to sign', async () => {
-    message = await AtlanteansAPI.fetchMessageToSign(SalePhase.CLAIM)
-    messageSigned = await signer.signMessage(message)
-    console.log(`message: ${message}`)
-    console.log(`messageSigned: ${messageSigned}`)
+    const message = await AtlanteansAPI.fetchMessageToSign(SalePhase.WL)
+    // console.log(`message: ${message}`)
+    // console.log(`messageSigned: ${messageSigned}`)
     expect(message).toContain('Atlantis World')
   }, 15000)
 
   it('should fetch proof', async () => {
-    const proof = await AtlanteansAPI.fetchProof(SalePhase.CLAIM, message, messageSigned)
+    const message = await AtlanteansAPI.fetchMessageToSign(SalePhase.WL)
+    const messageSigned = await signer.signMessage(message)
+    const proof = await AtlanteansAPI.fetchProof(SalePhase.WL, message, messageSigned)
     // console.log(`proof: ${proof}`)
-    expect(Array.isArray(proof) && proof.length > 0).toBeTruthy
+    expect(Array.isArray(proof) && proof.length > 0).toBeTruthy()
   }, 15000)
 
   it('should fetch signature', async () => {
+    const message = await AtlanteansAPI.fetchMessageToSign(SalePhase.CLAIM)
+    const messageSigned = await signer.signMessage(message)
     const signature = await AtlanteansAPI.fetchSignature(SalePhase.CLAIM, message, messageSigned)
     // console.log(`signature: ${signature}`)
-    expect(signature !== undefined && !signature.includes(constants.HashZero)).toBeTruthy
+    expect(signature !== undefined && !signature.includes(constants.HashZero)).toBeTruthy()
   }, 15000)
 })
