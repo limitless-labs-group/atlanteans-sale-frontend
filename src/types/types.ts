@@ -9,6 +9,8 @@ export type MerkleProof = string[]
 
 export type Address = `0x${string}`
 
+export type Tab = { name: string; href?: string; onClick?: () => void }
+
 export interface Token {
   address: Address
   symbol: string
