@@ -110,12 +110,22 @@ describe('AtlanteansSaleUtil', () => {
       hasClaimed = false
 
     itif(!hasClaimStarted)('should revert claim if phase has not started', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
+      const { error } = await AtlanteansSaleUtil.claim({
+        signer,
+        quantity: 1,
+        signature,
+        scrollsAmount: 1,
+      })
       expect(error).toBe(MintError.PHASE_NOT_STARTED)
     })
 
     itif(hasClaimEnded)('should revert claim if phase has ended', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
+      const { error } = await AtlanteansSaleUtil.claim({
+        signer,
+        quantity: 1,
+        signature,
+        scrollsAmount: 1,
+      })
       expect(error).toBe(MintError.PHASE_ENDED)
     })
 
@@ -123,7 +133,12 @@ describe('AtlanteansSaleUtil', () => {
       'should claim for the first time',
       async () => {
         const maxQuantityToClaim = await contract.faToRemainingClaim(MaxSchnaider)
-        const { tx } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
+        const { tx } = await AtlanteansSaleUtil.claim({
+          signer,
+          quantity: 1,
+          signature,
+          scrollsAmount: 1,
+        })
         const receipt = await tx?.wait()
         expect(receipt?.status).toBe(1)
         const quantityRemaining = await contract.faToRemainingClaim(MaxSchnaider)
@@ -134,7 +149,12 @@ describe('AtlanteansSaleUtil', () => {
     )
 
     itif(hasClaimed)('should revert claim if already claimed', async () => {
-      const { error } = await AtlanteansSaleUtil.claim({ signer, quantity: 1, signature })
+      const { error } = await AtlanteansSaleUtil.claim({
+        signer,
+        quantity: 1,
+        signature,
+        scrollsAmount: 1,
+      })
       expect(error).toBe(MintError.ALREADY_MINTED)
     })
   })

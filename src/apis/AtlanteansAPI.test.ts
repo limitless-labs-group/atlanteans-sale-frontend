@@ -25,8 +25,15 @@ describe('AtlanteansAPI', () => {
   it('should fetch signature', async () => {
     const message = await AtlanteansAPI.fetchMessageToSign(SalePhase.CLAIM)
     const messageSigned = await signer.signMessage(message)
-    const signature = await AtlanteansAPI.fetchSignature(SalePhase.CLAIM, message, messageSigned)
+    const encodedArgsResponse = await AtlanteansAPI.fetchEncodedArgs(
+      SalePhase.CLAIM,
+      message,
+      messageSigned
+    )
     // console.log(`signature: ${signature}`)
-    expect(signature !== undefined && !signature.includes(constants.HashZero)).toBeTruthy()
+    expect(
+      encodedArgsResponse !== undefined &&
+        !encodedArgsResponse.signature?.includes(constants.HashZero)
+    ).toBeTruthy()
   }, 15000)
 })
