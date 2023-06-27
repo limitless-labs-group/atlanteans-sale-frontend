@@ -1,2 +1,2 @@
 export * from './useFetchProof'
-export * from './useFetchSignature'
+export * from './useEncodedArgs'
