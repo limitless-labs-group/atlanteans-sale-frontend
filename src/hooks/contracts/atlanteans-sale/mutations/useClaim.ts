@@ -1,4 +1,4 @@
-import { useToast, useLogger, useNetwork, useFetchSignature } from '@/hooks'
+import { useToast, useLogger, useNetwork, useEncodedArgs } from '@/hooks'
 import { AtlanteansSaleUtil } from '@/contracts'
 import { useAccount, useMutation, useQueryClient, useSigner } from 'wagmi'
 import { SalePhase } from '@/constants'
@@ -15,7 +15,7 @@ export const useClaim = () => {
   const { isActiveChainSupported, activeChain } = useNetwork()
   const { address } = useAccount()
   const { data: signer } = useSigner()
-  const { mutateAsync: fetchSignature } = useFetchSignature()
+  const { mutateAsync: fetchEncodedArgs } = useEncodedArgs()
 
   const mutation = useMutation({
     mutationFn: async (quantity: number) => {
@@ -24,8 +24,9 @@ export const useClaim = () => {
         return
       }
 
-      const signature = await fetchSignature({ salePhase: SalePhase.CLAIM })
-      if (!signature) {
+      const encodedArgsResponse = await fetchEncodedArgs({ salePhase: SalePhase.CLAIM })
+
+      if (!encodedArgsResponse?.signature) {
         // TODO: toast error
         return
       }
@@ -34,9 +35,12 @@ export const useClaim = () => {
         address,
         chainId: activeChain?.id,
         signer,
-        signature,
+        signature: encodedArgsResponse?.signature ?? '0x',
+        scrollsAmount: encodedArgsResponse.scrollsAmount ?? 0,
         quantity,
       })
+      console.log('error', error)
+
       // TODO: toast error
       return tx
     },

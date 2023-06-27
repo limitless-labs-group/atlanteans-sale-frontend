@@ -41,6 +41,7 @@ interface IAtlanteansSaleUtilMintWithProof extends IAtlanteansSaleUtilMint {
 }
 interface IAtlanteansSaleUtilMintWithSignature extends IAtlanteansSaleUtilMint {
   signature: string
+  scrollsAmount: number
 }
 
 export class AtlanteansSaleUtil {
@@ -215,6 +216,7 @@ export class AtlanteansSaleUtil {
     chainId,
     signer,
     quantity,
+    scrollsAmount,
     signature,
   }: IAtlanteansSaleUtilMintWithSignature): IAtlanteansSaleUtilMintResponse => {
     // const [address, chainId] = await Promise.all([signer.getAddress(), signer.getChainId()])
@@ -223,10 +225,11 @@ export class AtlanteansSaleUtil {
       chainId,
     })
 
-    const [hasClaimStarted, hasClaimEnded, quantityRemaining] = await Promise.all([
+    const [hasClaimStarted, hasClaimEnded, quantityRemaining, faRegistered] = await Promise.all([
       contract.claimsStarted(),
       contract.claimsEnded(),
       contract.faToRemainingClaim(address ?? constants.AddressZero),
+      contract.faRegistered(address ?? constants.AddressZero),
     ])
 
     if (hasClaimEnded) {
@@ -239,12 +242,12 @@ export class AtlanteansSaleUtil {
         error: MintError.PHASE_NOT_STARTED,
       }
     }
-    if (quantityRemaining.lte(0)) {
+    if (faRegistered && quantityRemaining.lte(0)) {
       return {
         error: MintError.ALREADY_MINTED,
       }
     }
-    if (quantityRemaining.lt(quantity)) {
+    if (faRegistered && quantityRemaining.lt(quantity)) {
       return {
         error: MintError.LIMIT_TOTAL.replace('LIMIT_TO_REPLACE', quantityRemaining.toString()),
       }

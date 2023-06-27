@@ -3,25 +3,25 @@ import { SalePhase } from '@/constants'
 import { useLogger } from '@/hooks'
 import { useMutation, useSigner } from 'wagmi'
 
-interface IFetchSignature {
+interface IEncodedArgs {
   salePhase: SalePhase
 }
 
-export const useFetchSignature = () => {
-  const log = useLogger(useFetchSignature.name)
+export const useEncodedArgs = () => {
+  const log = useLogger(useEncodedArgs.name)
 
   const { data: signer } = useSigner()
 
   const mutation = useMutation({
-    mutationFn: async ({ salePhase }: IFetchSignature) => {
+    mutationFn: async ({ salePhase }: IEncodedArgs) => {
       if (!signer) {
         return undefined
       }
       const message = await AtlanteansAPI.fetchMessageToSign(salePhase)
       const messageSigned = await signer.signMessage(message) // waiting for user to sign msg in wallet
       log.verbose(messageSigned)
-      const signature = await AtlanteansAPI.fetchSignature(salePhase, message, messageSigned)
-      return signature
+      const encodedArgs = await AtlanteansAPI.fetchEncodedArgs(salePhase, message, messageSigned)
+      return encodedArgs
     },
     onError: (error: any, variables, context) => {
       log.error({ error, variables, context })
