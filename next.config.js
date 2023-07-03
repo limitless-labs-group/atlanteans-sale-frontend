@@ -14,4 +14,5 @@ const nextConfig = {
   distDir: 'build',
 }
 
-module.exports = withSentryConfig(nextConfig, { silent: true }, { hideSourceMaps: true })
+module.exports = nextConfig
+// module.exports = withSentryConfig(nextConfig, { silent: true }, { hideSourceMaps: true })
