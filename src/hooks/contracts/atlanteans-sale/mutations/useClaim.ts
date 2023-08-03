@@ -24,7 +24,7 @@ export const useClaim = () => {
         return
       }
 
-      const encodedArgsResponse = await fetchEncodedArgs({ salePhase: SalePhase.CLAIM })
+      const encodedArgsResponse = await fetchEncodedArgs({ salePhase: SalePhase.CLAIM, quantity })
 
       if (!encodedArgsResponse?.signature) {
         // TODO: toast error
