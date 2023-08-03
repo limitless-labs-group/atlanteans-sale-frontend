@@ -23,12 +23,14 @@ describe('AtlanteansAPI', () => {
   }, 15000)
 
   it('should fetch signature', async () => {
+    const quantity = 1
     const message = await AtlanteansAPI.fetchMessageToSign(SalePhase.CLAIM)
     const messageSigned = await signer.signMessage(message)
     const encodedArgsResponse = await AtlanteansAPI.fetchEncodedArgs(
       SalePhase.CLAIM,
       message,
-      messageSigned
+      messageSigned,
+      quantity
     )
     // console.log(`signature: ${signature}`)
     expect(
