@@ -48,7 +48,7 @@ export class AtlanteansAPI {
     salePhase: SalePhase,
     message: string,
     messageSigned: string,
-    quantity?: number
+    quantity: number
   ) => {
     const response = await this.http.post<IFetchEncodedArgsResponse>(`/encoded-args/${salePhase}`, {
       digest: message,
