@@ -255,7 +255,7 @@ export class AtlanteansSaleUtil {
 
     const nonce = await signer.getTransactionCount()
 
-    const tx = await contract.claimSummon(signature, quantity, quantity, {
+    const tx = await contract.claimSummon(signature, scrollsAmount, quantity, {
       gasLimit: MINT_GAS_LIMIT,
       nonce,
     })
